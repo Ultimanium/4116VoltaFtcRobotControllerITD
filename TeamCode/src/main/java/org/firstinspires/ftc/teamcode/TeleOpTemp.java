@@ -123,7 +123,7 @@ public class TeleOpTemp extends LinearOpMode {
             double crPower = 0;
             if (gamepad2.left_bumper){
                 clPower = 1;
-                crPower = -1;
+                crPower = 1;
             }else if(gamepad2.right_bumper){
                 clPower = -1;
                 crPower = -1;
