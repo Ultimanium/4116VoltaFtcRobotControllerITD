@@ -116,20 +116,26 @@ public class TeleOpTemp extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        boolean toggleR = false;
+        boolean toggleL = false;
+        double armPower = 0.355;
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
             double clPower = 0;
             double crPower = 0;
-            if (gamepad2.left_bumper){
-                clPower = 1;
-                crPower = 1;
-            }else if(gamepad2.right_bumper){
-                clPower = -1;
-                crPower = -1;
-            }else{
-                clPower = 0;
-                crPower = 0;
+            if (gamepad2.left_bumper && !toggleL){
+                toggleL = true;
+                armPower += 0.05;
+            } else if(!gamepad2.left_bumper){
+                toggleL = false;
+            }
+            if(gamepad2.right_bumper && !toggleR){
+                toggleR = true;
+                armPower -= 0.05;
+            } else if(!gamepad2.right_bumper){
+                toggleR = false;
             }
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -144,7 +150,7 @@ public class TeleOpTemp extends LinearOpMode {
             }else{
                 speed = 0.75;
             }
-            double armPower = gamepad2.right_stick_y + 0.355;
+
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
             double leftFrontPower  = (axial + lateral + yaw)*speed;
@@ -194,6 +200,8 @@ public class TeleOpTemp extends LinearOpMode {
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Arm", armPower);
+            telemetry.addData("cr", crPower);
+            telemetry.addData("cl", clPower);
             telemetry.update();
         }
     }}
