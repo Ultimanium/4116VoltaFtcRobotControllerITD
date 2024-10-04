@@ -75,7 +75,8 @@ public class TeleOpTemp extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private CRServo arm = null;
-    private Servo claw = null;
+    private CRServo cl = null;
+    private CRServo cr = null;
     @Override
     public void runOpMode() {
 
@@ -86,7 +87,8 @@ public class TeleOpTemp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frw");
         rightBackDrive = hardwareMap.get(DcMotor.class, "brw");
         arm = hardwareMap.get(CRServo.class, "arm");
-        claw = hardwareMap.get(Servo.class, "c");
+        cl = hardwareMap.get(CRServo.class, "cl");
+        cr = hardwareMap.get(CRServo.class, "cr");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
@@ -115,10 +117,17 @@ public class TeleOpTemp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
+            double clPower = 0;
+            double crPower = 0;
             if (gamepad2.left_bumper){
-                claw.setPosition(1);
-            } else {
-                claw.setPosition(0);
+                clPower = 1;
+                crPower = -1;
+            }else if(gamepad2.right_bumper){
+                clPower = -1;
+                crPower = -1;
+            }else{
+                clPower = 0;
+                crPower = 0;
             }
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -176,7 +185,8 @@ public class TeleOpTemp extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
             arm.setPower(armPower);
-
+            cl.setPower(clPower);
+            cr.setPower(crPower);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
