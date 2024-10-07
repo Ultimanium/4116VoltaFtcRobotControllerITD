@@ -77,9 +77,6 @@ public class TeleOpTemp extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private CRServo arm = null;
-    private CRServo cl = null;
-    private CRServo cr = null;
-    private Servo w = null;
     @Override
     public void runOpMode() {
 
@@ -90,9 +87,6 @@ public class TeleOpTemp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frw");
         rightBackDrive = hardwareMap.get(DcMotor.class, "brw");
         arm = hardwareMap.get(CRServo.class, "arm");
-        cl = hardwareMap.get(CRServo.class, "cl");
-        cr = hardwareMap.get(CRServo.class, "cr");
-        w = hardwareMap.get(Servo.class, "w");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
@@ -125,22 +119,18 @@ public class TeleOpTemp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
-            double cPower = 0;
-            double wr = 0;
             if (gamepad2.left_bumper && !toggleL){
                 toggleL = true;
-                armPower += 0.05;
+                armPower += 0.1;
             } else if(!gamepad2.left_bumper){
                 toggleL = false;
             }
             if(gamepad2.right_bumper && !toggleR){
                 toggleR = true;
-                armPower -= 0.05;
+                armPower -= 0.1;
             } else if(!gamepad2.right_bumper){
                 toggleR = false;
             }
-            cPower = gamepad2.left_stick_y; //Input to "claw" rotators
-            wr = gamepad2.right_stick_x;
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
@@ -196,16 +186,11 @@ public class TeleOpTemp extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
             arm.setPower(armPower);
-            cl.setPower(-cPower);
-            cr.setPower(cPower);
-            w.setPosition(wr);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Arm", armPower);
-            telemetry.addData("cr", -cPower);
-            telemetry.addData("cl", cPower);
             telemetry.update();
         }
     }}
