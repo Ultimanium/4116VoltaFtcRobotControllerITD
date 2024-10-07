@@ -79,6 +79,7 @@ public class TeleOpTemp extends LinearOpMode {
     private CRServo arm = null;
     private CRServo cl = null;
     private CRServo cr = null;
+    private Servo w = null;
     @Override
     public void runOpMode() {
 
@@ -91,6 +92,7 @@ public class TeleOpTemp extends LinearOpMode {
         arm = hardwareMap.get(CRServo.class, "arm");
         cl = hardwareMap.get(CRServo.class, "cl");
         cr = hardwareMap.get(CRServo.class, "cr");
+        w = hardwareMap.get(Servo.class, "w");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
@@ -124,6 +126,7 @@ public class TeleOpTemp extends LinearOpMode {
         while (opModeIsActive()) {
             double max;
             double cPower = 0;
+            double wr = 0;
             if (gamepad2.left_bumper && !toggleL){
                 toggleL = true;
                 armPower += 0.05;
@@ -137,6 +140,7 @@ public class TeleOpTemp extends LinearOpMode {
                 toggleR = false;
             }
             cPower = gamepad2.left_stick_y; //Input to "claw" rotators
+            wr = gamepad2.right_stick_x;
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
@@ -194,6 +198,7 @@ public class TeleOpTemp extends LinearOpMode {
             arm.setPower(armPower);
             cl.setPower(-cPower);
             cr.setPower(cPower);
+            w.setPosition(wr);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
