@@ -78,7 +78,7 @@ public class TeleOpTemp extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private CRServo arm = null;
     private Servo w = null;
-    private CRServo c = null;
+    private Servo c = null;
     @Override
     public void runOpMode() {
 
@@ -90,7 +90,7 @@ public class TeleOpTemp extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "brw");
         arm = hardwareMap.get(CRServo.class, "arm");
         w = hardwareMap.get(Servo.class, "w");
-        c = hardwareMap.get(CRServo.class, "c");
+        c = hardwareMap.get(Servo.class, "c");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -138,6 +138,8 @@ public class TeleOpTemp extends LinearOpMode {
             } else if(!gamepad2.right_bumper){
                 toggleR = false;
             }
+            if(gamepad2.b){cr = 1;}
+            if (gamepad2.a){cr = 0;}
             wr = gamepad2.right_stick_x;
             cr = gamepad2.left_stick_x;
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -195,7 +197,7 @@ public class TeleOpTemp extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
             arm.setPower(armPower);
-            c.setPower(cr);
+            c.setPosition(cr);
             w.setPosition(wr);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
