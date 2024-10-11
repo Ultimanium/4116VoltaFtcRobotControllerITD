@@ -199,6 +199,8 @@ public class TeleOpTemp extends LinearOpMode {
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Arm", armPower);
+            telemetry.addData("c", cr);
+            telemetry.addData("w", wr);
             telemetry.update();
         }
     }}
