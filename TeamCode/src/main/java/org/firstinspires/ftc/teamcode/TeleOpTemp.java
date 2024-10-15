@@ -118,7 +118,7 @@ public class TeleOpTemp extends LinearOpMode {
 
         boolean toggleR = false;
         boolean toggleL = false;
-        double armPower = 0.355;
+        double armPower = -0.355;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
