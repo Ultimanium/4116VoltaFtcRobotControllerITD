@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /*
  * This file contains an example of a Linear "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
+ * The names of OpModes appear on the menu of  the FTC Driver Station.
  * When a selection is made from the menu, the corresponding OpMode is executed.
  *
  * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
@@ -79,6 +79,7 @@ public class TeleOpTemp extends LinearOpMode {
     private CRServo arm = null;
     private CRServo c = null;
     private Servo w = null;
+    private Servo e = null;
     @Override
     public void runOpMode() {
 
@@ -142,6 +143,7 @@ public class TeleOpTemp extends LinearOpMode {
             double speed= 0.75;
             double wr = gamepad2.right_stick_x;
             double cr = gamepad2.left_stick_x;
+            double ex = gamepad2.right_stick_y;
             if (gamepad1.right_bumper){
                 speed = 0.325;
             } else if(gamepad1.left_bumper){
@@ -194,6 +196,7 @@ public class TeleOpTemp extends LinearOpMode {
             arm.setPower(armPower);
             c.setPower(cr);
             w.setPosition(wr);
+            e.setPosition(ex);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
