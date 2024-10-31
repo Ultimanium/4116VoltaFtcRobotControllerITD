@@ -144,6 +144,9 @@ public class TeleOpTemp extends LinearOpMode {
             double wr = gamepad2.right_stick_x;
             double cr = gamepad2.left_stick_x;
             double ex = gamepad2.right_stick_y;
+            if(ex<0){
+                ex=0;
+            }
             if (gamepad1.right_bumper){
                 speed = 0.325;
             } else if(gamepad1.left_bumper){
