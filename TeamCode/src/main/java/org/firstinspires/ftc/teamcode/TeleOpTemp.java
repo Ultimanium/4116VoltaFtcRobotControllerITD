@@ -210,6 +210,8 @@ public class TeleOpTemp extends LinearOpMode {
             telemetry.addData("Arm", armPower);
             telemetry.addData("c", cr);
             telemetry.addData("w", wr);
+            telemetry.addData("e", ex);
+            telemetry.addData("l", li);
             telemetry.update();
         }
     }
