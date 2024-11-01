@@ -81,6 +81,7 @@ public class TeleOpTemp extends LinearOpMode {
     private Servo w = null;
     private Servo e = null;
     private DcMotor l = null;
+    private DcMotor l2 = null
     @Override
     public void runOpMode() {
 
@@ -203,6 +204,7 @@ public class TeleOpTemp extends LinearOpMode {
             w.setPosition(wr);
             e.setPosition(ex);
             l.setPower(li);
+            l2.setPower(-li);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
