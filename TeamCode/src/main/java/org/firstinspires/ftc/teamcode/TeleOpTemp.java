@@ -45,11 +45,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
  * This code will work with either a Mecanum-Drive or an X-Drive train.
  * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
- * Note that a Mecanum drive must display an X roller-pattern when viewed from above.
+ * Note that a Mecanum drive must display an X rol-
+ * 9
+ * -----
+ *
+ * ler-pattern when viewed from above.
  *
  * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
  *
- * Holonomic drives provide the ability for the robot to move in three axes (directions) simultaneously.
+ * Holonomic drives
+ * provide the ability for the robot to move in three axes (directions) simultaneously.
  * Each motion axis is controlled by one Joystick axis.
  *
  * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
@@ -203,8 +208,8 @@ public class TeleOpTemp extends LinearOpMode {
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
-            l.setPower(li/3);
-            l2.setPower(-li/3);
+            l.setPower(li/5);
+            l2.setPower(-li/5);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
