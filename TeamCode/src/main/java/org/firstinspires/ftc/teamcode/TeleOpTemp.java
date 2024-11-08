@@ -81,7 +81,7 @@ public class TeleOpTemp extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private CRServo arm = null;
+    private Servo arm = null;
     private CRServo c = null;
     private Servo w = null;
     private Servo e = null;
@@ -96,7 +96,7 @@ public class TeleOpTemp extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "blw");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frw");
         rightBackDrive = hardwareMap.get(DcMotor.class, "brw");
-        arm = hardwareMap.get(CRServo.class, "arm");
+        arm = hardwareMap.get(Servo.class, "arm");
         c = hardwareMap.get(CRServo.class, "c");
         w = hardwareMap.get(Servo.class, "w");
         l = hardwareMap.get(DcMotor.class, "l");
@@ -204,10 +204,18 @@ public class TeleOpTemp extends LinearOpMode {
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower/4);
+
+
+
+
+
+
+
+
             rightFrontDrive.setPower(rightFrontPower/4);
             leftBackDrive.setPower(leftBackPower/4);
             rightBackDrive.setPower(rightBackPower/4);
-            arm.setPower(armPower/4);
+            arm.setPosition(armPower/4);
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
