@@ -99,6 +99,9 @@ public class TeleOpTemp extends LinearOpMode {
         arm = hardwareMap.get(CRServo.class, "arm");
         c = hardwareMap.get(CRServo.class, "c");
         w = hardwareMap.get(Servo.class, "w");
+        l = hardwareMap.get(DcMotor.class, "l");
+        l2 = hardwareMap.get(DcMotor.class, "l2");
+        e = hardwareMap.get(Servo.class, "e");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
