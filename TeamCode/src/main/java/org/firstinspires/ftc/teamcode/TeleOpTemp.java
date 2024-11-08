@@ -215,7 +215,7 @@ public class TeleOpTemp extends LinearOpMode {
             rightFrontDrive.setPower(rightFrontPower/4);
             leftBackDrive.setPower(leftBackPower/4);
             rightBackDrive.setPower(rightBackPower/4);
-            arm.setPosition(armPower/4);
+            arm.setPosition(armPower);
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
