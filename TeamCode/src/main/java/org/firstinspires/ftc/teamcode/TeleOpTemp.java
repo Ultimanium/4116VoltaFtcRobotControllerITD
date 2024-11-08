@@ -200,11 +200,11 @@ public class TeleOpTemp extends LinearOpMode {
 */
 
             // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-            arm.setPower(armPower);
+            leftFrontDrive.setPower(leftFrontPower/4);
+            rightFrontDrive.setPower(rightFrontPower/4);
+            leftBackDrive.setPower(leftBackPower/4);
+            rightBackDrive.setPower(rightBackPower/4);
+            arm.setPower(armPower/4);
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
