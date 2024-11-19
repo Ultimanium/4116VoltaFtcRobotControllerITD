@@ -209,8 +209,8 @@ public class TeleOpTemp extends LinearOpMode {
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
-            l.setPower(-li/1.25);
-            l2.setPower(li/1.25);
+            l.setPower(-li/1.25*ls);
+            l2.setPower(li/1.25*ls);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
