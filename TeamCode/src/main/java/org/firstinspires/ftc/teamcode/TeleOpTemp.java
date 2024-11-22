@@ -167,7 +167,7 @@ public class TeleOpTemp extends LinearOpMode {
             max = Math.max(max, Math.abs(rightBackPower));
             double ls = 1;
             if (gamepad1.left_bumper){speed = 0.5;}else if (gamepad1.right_bumper){speed = 1.5;}else{speed = 1;}
-            if(gamepad2.left_bumper){ls=1.4;}
+            if(gamepad2.left_bumper){ls=2;}
             if (max > 1.0) {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
@@ -209,8 +209,8 @@ public class TeleOpTemp extends LinearOpMode {
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
-            l.setPower(-li/1.75*ls);
-            l2.setPower(li/1.75*ls);
+            l.setPower(-li/2.2*ls);
+            l2.setPower(li/2.2*ls);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
