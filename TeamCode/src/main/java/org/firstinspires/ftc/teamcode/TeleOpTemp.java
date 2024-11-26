@@ -132,9 +132,9 @@ public class TeleOpTemp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
-            if (gamepad2.a){armPower=0;}
-            if(gamepad2.x){armPower =1;}
-            if (gamepad2.b){armPower=-1;}
+            if (gamepad2.a){armPower=0.6;}
+            if(gamepad2.x){armPower =0.8;}
+            if (gamepad2.b){armPower=0;}
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
