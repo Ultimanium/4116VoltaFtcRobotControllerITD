@@ -126,16 +126,15 @@ public class TeleOpTemp extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-
+        double armPower = 0;
         boolean toggleR = false;
         boolean toggleL = false;
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double armPower = 0;
             double max;
             if (gamepad2.a){armPower=0;}
-            if(gamepad2.x){armPower = 0.3;}
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            if(gamepad2.x){armPower =1;}
+            if (gamepad2.b){armPower=-1;}
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
@@ -221,7 +220,7 @@ public class TeleOpTemp extends LinearOpMode {
             telemetry.addData("w", wr);
             telemetry.addData("e", ex);
             telemetry.addData("l", li);
-            telemetry.update();
+            telemetry.addData("arm",armPower);  telemetry.update();
         }
     }
 }
