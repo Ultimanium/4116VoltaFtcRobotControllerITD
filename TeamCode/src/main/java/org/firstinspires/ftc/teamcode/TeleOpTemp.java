@@ -140,7 +140,7 @@ public class TeleOpTemp extends LinearOpMode {
             double yaw     =  gamepad1.right_stick_x;
             double speed= 0.75;
             double wr = gamepad2.right_stick_x;
-            double cr = gamepad2.left_trigger;
+            double cr = gamepad2.left_trigger * 1.15;
             double ex = 1 - gamepad2.right_trigger;
             double li = gamepad2.left_stick_y;
             if(ex<0){
