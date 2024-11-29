@@ -45,11 +45,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
  * This code will work with either a Mecanum-Drive or an X-Drive train.
  * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
- * Note that a Mecanum drive must display an X roller-pattern when viewed from above.
+ * Note that a Mecanum drive must display an X rol-
+ * 9
+ * -----
+ *
+ * ler-pattern when viewed from above.
  *
  * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
  *
- * Holonomic drives provide the ability for the robot to move in three axes (directions) simultaneously.
+ * Holonomic drives
+ * provide the ability for the robot to move in three axes (directions) simultaneously.
  * Each motion axis is controlled by one Joystick axis.
  *
  * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
@@ -76,23 +81,27 @@ public class TeleOpTemp extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private CRServo arm = null;
+    private Servo arm = null;
     private CRServo c = null;
     private Servo w = null;
     private Servo e = null;
     private DcMotor l = null;
+    private DcMotor l2 = null;
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
+        // to the names assigned during the robot configuration step on the DS or RC devices
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "flw");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "blw");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frw");
         rightBackDrive = hardwareMap.get(DcMotor.class, "brw");
-        arm = hardwareMap.get(CRServo.class, "arm");
+        arm = hardwareMap.get(Servo.class, "arm");
         c = hardwareMap.get(CRServo.class, "c");
         w = hardwareMap.get(Servo.class, "w");
+        l = hardwareMap.get(DcMotor.class, "l");
+        l2 = hardwareMap.get(DcMotor.class, "l2");
+        e = hardwareMap.get(Servo.class, "e");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
@@ -117,34 +126,22 @@ public class TeleOpTemp extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-
+        double armPower = 0;
         boolean toggleR = false;
         boolean toggleL = false;
-        double armPower = -0.355;
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
-            if (gamepad2.left_bumper && !toggleL){
-                toggleL = true;
-                armPower += 0.1;
-            } else if(!gamepad2.left_bumper){
-                toggleL = false;
-            }
-            if(gamepad2.right_bumper && !toggleR){
-                toggleR = true;
-                armPower -= 0.1;
-            } else if(!gamepad2.right_bumper){
-                toggleR = false;
-            }
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            if (gamepad2.a){armPower=0.6;}
+            if(gamepad2.x){armPower =0.8;}
+            if (gamepad2.b){armPower=0;}
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
             double speed= 0.75;
-            double wr = gamepad2.right_stick_x;
-            double cr = gamepad2.left_stick_x;
-            double ex = gamepad2.right_stick_y;
+            double wr = gamepad2.right_stick_x + 0.3;
+            double cr = gamepad2.left_trigger * 1.3;
+            double ex = 1 - gamepad2.right_trigger;
             double li = gamepad2.left_stick_y;
             if(ex<0){
                 ex=0;
@@ -168,7 +165,9 @@ public class TeleOpTemp extends LinearOpMode {
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
+            double ls = 1;
             if (gamepad1.left_bumper){speed = 0.5;}else if (gamepad1.right_bumper){speed = 1.5;}else{speed = 1;}
+            if(gamepad2.left_bumper){ls=2;}
             if (max > 1.0) {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
@@ -195,14 +194,23 @@ public class TeleOpTemp extends LinearOpMode {
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
+
+
+
+
+
+
+
+
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
-            arm.setPower(armPower);
+            arm.setPosition(armPower);
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
-            l.setPower(li);
+            l.setPower(-li/2.2*ls);
+            l2.setPower(li/2.2*ls);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
@@ -212,7 +220,7 @@ public class TeleOpTemp extends LinearOpMode {
             telemetry.addData("w", wr);
             telemetry.addData("e", ex);
             telemetry.addData("l", li);
-            telemetry.update();
+            telemetry.addData("arm",armPower);  telemetry.update();
         }
     }
 }
