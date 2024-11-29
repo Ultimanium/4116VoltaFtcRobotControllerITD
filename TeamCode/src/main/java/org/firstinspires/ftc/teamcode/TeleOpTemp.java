@@ -91,7 +91,7 @@ public class TeleOpTemp extends LinearOpMode {
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
+        // to the names assigned during the robot configuration step on the DS or RC devices
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "flw");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "blw");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frw");
