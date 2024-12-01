@@ -147,7 +147,7 @@ public class TeleOpTemp extends LinearOpMode {
         boolean toggleR = false;
         boolean toggleL = false;
         // run until the end of the match (driver presses STOP)
-        float wr = 0.3f;
+        float wr = (float)w.getPosition();
         while (opModeIsActive()) {
             long startTime = System.nanoTime();
             double max;
