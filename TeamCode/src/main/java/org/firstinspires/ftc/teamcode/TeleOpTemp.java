@@ -30,11 +30,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -71,12 +74,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 //testing purposes
 
-@TeleOp(name="TeleOpTest", group="Linear OpMode")
+@TeleOp(name="VoltaTeleOp", group="Linear OpMode")
 
 public class TeleOpTemp extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
+    private TouchSensor up, down;
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
@@ -87,6 +91,8 @@ public class TeleOpTemp extends LinearOpMode {
     private Servo e = null;
     private DcMotor l = null;
     private DcMotor l2 = null;
+    private Encoder leftEncoder,rightEncoder, frontEncoder;
+    private double ls = -1,lds = 1,mult = 1;
     @Override
     public void runOpMode() {
 
@@ -102,6 +108,13 @@ public class TeleOpTemp extends LinearOpMode {
         l = hardwareMap.get(DcMotor.class, "l");
         l2 = hardwareMap.get(DcMotor.class, "l2");
         e = hardwareMap.get(Servo.class, "e");
+        up = hardwareMap.get(TouchSensor.class, "UpS");
+        down = hardwareMap.get(TouchSensor.class, "DoS");
+
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l2"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frw"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l"));
+
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
@@ -120,6 +133,8 @@ public class TeleOpTemp extends LinearOpMode {
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        l.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        l2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -130,17 +145,19 @@ public class TeleOpTemp extends LinearOpMode {
         boolean toggleR = false;
         boolean toggleL = false;
         // run until the end of the match (driver presses STOP)
+        float wr = 0.3f;
         while (opModeIsActive()) {
+            long startTime = System.nanoTime();
             double max;
-            if (gamepad2.a){armPower=0.6;}
+            if (gamepad2.a){armPower=0.65;}
             if(gamepad2.x){armPower =0.8;}
             if (gamepad2.b){armPower=0;}
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
             double speed= 0.75;
-            double wr = gamepad2.right_stick_x + 0.3;
-            double cr = gamepad2.left_trigger * 1.3;
+            double wrv = gamepad2.right_stick_x;
+            double cr = gamepad2.left_trigger;
             double ex = 1 - gamepad2.right_trigger;
             double li = gamepad2.left_stick_y;
             if(ex<0){
@@ -165,9 +182,21 @@ public class TeleOpTemp extends LinearOpMode {
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
-            double ls = 1;
+            if(up.isPressed()){
+                ls = 0;
+            }
+            else {
+                ls = -1;
+            }
+
+            if(down.isPressed()){
+                lds = 0;
+            }
+            else {
+                lds = 1;
+            }
             if (gamepad1.left_bumper){speed = 0.5;}else if (gamepad1.right_bumper){speed = 1.5;}else{speed = 1;}
-            if(gamepad2.left_bumper){ls=2;}
+            if(gamepad2.left_bumper){mult=1.8;} else {mult=1;}
             if (max > 1.0) {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
@@ -192,16 +221,16 @@ public class TeleOpTemp extends LinearOpMode {
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
 */
 
+            long curTime = System.nanoTime() - startTime;
+
+            float curSec = curTime / 30000000f;
+
+            wr += ((float)wrv / 300);
+            wr = Math.max(wr,0f);
+            wr = Math.min(wr,1f);
+
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
-
-
-
-
-
-
-
-
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
@@ -209,17 +238,24 @@ public class TeleOpTemp extends LinearOpMode {
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
-            l.setPower(-li/2.2*ls);
-            l2.setPower(li/2.2*ls);
+            l.setPower(-Math.min(Math.max((li/1.8),ls),lds) * mult);
+            l2.setPower(Math.min(Math.max((li/1.8),ls),lds) * mult);
             // Show the elapsed game time and wheel power.
+
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Arm", armPower);
             telemetry.addData("c", cr);
             telemetry.addData("w", wr);
+            telemetry.addData("wv", wrv);
+            telemetry.addData("loopTime", curTime / 3000000f);
             telemetry.addData("e", ex);
             telemetry.addData("l", li);
+            telemetry.addData("Up",up.isPressed());
+            telemetry.addData("leftEncoder", leftEncoder.getCurrentPosition());
+            telemetry.addData("rightEncoder", rightEncoder.getCurrentPosition());
+            telemetry.addData("frontEncoder", frontEncoder.getCurrentPosition());
             telemetry.addData("arm",armPower);  telemetry.update();
         }
     }
