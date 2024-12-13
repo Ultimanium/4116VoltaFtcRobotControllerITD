@@ -114,8 +114,6 @@ public class VoltaTeleOp extends LinearOpMode {
         down = hardwareMap.get(TouchSensor.class, "DoS");
 
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l2"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frw"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l"));
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -147,12 +145,12 @@ public class VoltaTeleOp extends LinearOpMode {
         boolean toggleR = false;
         boolean toggleL = false;
         // run until the end of the match (driver presses STOP)
-        float wr = (float)w.getPosition();
+        float wr = 0.8f;
         while (opModeIsActive()) {
             long startTime = System.nanoTime();
             double max;
-            if (gamepad2.a){armPower=0.13;}
-            if(gamepad2.x){armPower =0.16;}
+            if (gamepad2.a){armPower=0.16;}
+            if(gamepad2.x){armPower =0.213;}
             if (gamepad2.b){armPower=0;}
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
@@ -198,7 +196,7 @@ public class VoltaTeleOp extends LinearOpMode {
                 lds = 1;
             }
             if (gamepad1.left_bumper){speed = 0.5;}else if (gamepad1.right_bumper){speed = 1.5;}else{speed = 1;}
-            if(gamepad2.left_bumper){mult=1.8;} else {mult=1;}
+            if(gamepad2.right_bumper){mult=1.8;} else {mult=1;}
             if (max > 1.0) {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
@@ -227,9 +225,9 @@ public class VoltaTeleOp extends LinearOpMode {
 
             float curSec = curTime / 30000000f;
 
-            wr += ((float)wrv / 300);
-            wr = Math.max(wr,0f);
-            wr = Math.min(wr,1f);
+            wr += ((float)wrv / 150);
+            wr = Math.max(wr,0.2f);
+            wr = Math.min(wr,0.8f);
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
@@ -255,9 +253,7 @@ public class VoltaTeleOp extends LinearOpMode {
             telemetry.addData("e", ex);
             telemetry.addData("l", li);
             telemetry.addData("Up",up.isPressed());
-            telemetry.addData("leftEncoder", leftEncoder.getCurrentPosition());
-            telemetry.addData("rightEncoder", rightEncoder.getCurrentPosition());
-            telemetry.addData("frontEncoder", frontEncoder.getCurrentPosition());
+            telemetry.addData("lift", leftEncoder.getCurrentPosition());
             telemetry.addData("arm",armPower);  telemetry.update();
         }
     }
