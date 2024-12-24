@@ -152,8 +152,12 @@ public class VoltaTeleOp extends LinearOpMode {
             if (gamepad2.a){armPower=0.16;}
             if(gamepad2.x){armPower =0.213;}
             if (gamepad2.b){armPower=0;}
+            double rm;
+            if(gamepad1.dpad_right){
+                rm = 1;
+            }else{rm=0;}
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
+            double lateral =  gamepad1.left_stick_x + rm;
             double yaw     =  gamepad1.right_stick_x;
             double speed= 0.75;
             double wrv = gamepad2.right_stick_x;
@@ -238,8 +242,8 @@ public class VoltaTeleOp extends LinearOpMode {
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(ex);
-            l.setPower(-Math.min(Math.max((li/1.8),ls),lds) * mult);
-            l2.setPower(Math.min(Math.max((li/1.8),ls),lds) * mult);
+            l.setPower(-Math.min(Math.max(li,ls),lds));
+            l2.setPower(Math.min(Math.max(li,ls),lds));
             // Show the elapsed game time and wheel power.
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
