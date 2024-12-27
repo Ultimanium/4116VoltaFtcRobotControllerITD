@@ -141,7 +141,7 @@ public class VoltaTeleOp extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        double armPower = 0;
+        double armPower = 1;
         boolean toggleR = false;
         boolean toggleL = false;
         // run until the end of the match (driver presses STOP)
@@ -149,9 +149,9 @@ public class VoltaTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             long startTime = System.nanoTime();
             double max;
-            if (gamepad2.a){armPower=0.16;}
-            if(gamepad2.x){armPower =0.213;}
-            if (gamepad2.b){armPower=0;}
+            if (gamepad2.a){armPower=0.23;}
+            if(gamepad2.x){armPower =0;}
+            if (gamepad2.b){armPower=1;}
             double rm;
             if(gamepad1.dpad_right){
                 rm = 1;

@@ -179,9 +179,9 @@ public class Voltanomous extends LinearOpMode {
         Pose2d startPose = new Pose2d(0, 0, 0);
         Pose2d endPose = new Pose2d(0, 0, 0);
 
-        Pose2d redSample1 = new Pose2d(-48, -17.5, Math.toRadians(-90));
-        Pose2d redSample2 = new Pose2d(-58, -17.5, Math.toRadians(-90));
-        Pose2d preGrab = new Pose2d(-32, -4, Math.toRadians(-180));
+        Pose2d redSample1 = new Pose2d(-48, -18, Math.toRadians(-90));
+        Pose2d redSample2 = new Pose2d(-56, -19, Math.toRadians(-90));
+        Pose2d preGrab = new Pose2d(-32, -4, Math.toRadians(-190));
         Pose2d prePreGrab = new Pose2d(-32, -10, Math.toRadians(-180));
         Pose2d grab = new Pose2d(-32, 2, Math.toRadians(-180));
         switch(position){
@@ -208,12 +208,12 @@ public class Voltanomous extends LinearOpMode {
                 .strafeRight(30.5)
                 .build();
         Trajectory toBarSpeed = drive.trajectoryBuilder(startPose)
-                .splineToConstantHeading(new Vector2d(0, -32), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(-14, -32), Math.toRadians(-90))
                 .build();
-        Trajectory awayFromBar = drive.trajectoryBuilder(new Pose2d(0, -31.5, 0))
+        Trajectory awayFromBar = drive.trajectoryBuilder(new Pose2d(-14, -31.5, 0))
                 .strafeLeft(25)
                 .build();
-        Trajectory returnStart = drive.trajectoryBuilder(new Pose2d(0, -7, 0))
+        Trajectory returnStart = drive.trajectoryBuilder(new Pose2d(-14, -7, 0))
                 .lineToLinearHeading(endPose)
                 .build();
         Trajectory grabRed1 = drive.trajectoryBuilder(endPose)
@@ -223,22 +223,25 @@ public class Voltanomous extends LinearOpMode {
                 .lineToLinearHeading(preGrab)
                 .build();
         Trajectory grabRed2 = drive.trajectoryBuilder(preGrab)
-                .lineToLinearHeading(redSample2)
+                .splineToSplineHeading(redSample2, Math.toRadians(90))
                 .build();
         Trajectory grabReturn2 = drive.trajectoryBuilder(redSample2)
                 .lineToLinearHeading(preGrab)
                 .build();
+        Trajectory switchGrab = drive.trajectoryBuilder(preGrab)
+                .lineToLinearHeading(prePreGrab)
+                .build();
         Trajectory clampPre = drive.trajectoryBuilder(redSample2)
                 .lineToLinearHeading(new Pose2d(0, 0, 0))
                 .build();
-        Trajectory grabReturn3 = drive.trajectoryBuilder(new Pose2d(0, -7, 0))
+        Trajectory grabReturn3 = drive.trajectoryBuilder(new Pose2d(-9, -7, 0))
                 .lineToLinearHeading(prePreGrab)
                 .build();
         Trajectory grabThatThang = drive.trajectoryBuilder(prePreGrab)
                 .lineToLinearHeading(grab)
                 .build();
         Trajectory toBar2 = drive.trajectoryBuilder(grab)
-                .splineToSplineHeading(new Pose2d(-5, -31.5, Math.toRadians(0)), Math.toRadians(-90))
+                .splineToSplineHeading(new Pose2d(-9, -31.5, Math.toRadians(0)), Math.toRadians(-90))
                 .build();
         selectStartingDelay();
 
@@ -282,29 +285,30 @@ public class Voltanomous extends LinearOpMode {
             case Right:
                 wrist.setPosition(0.2);
                 claw.setPower(1);
-                arm.setPosition(0.16);
+                arm.setPosition(0.23);
                 drive.followTrajectory(grabRed1);
-                arm.setPosition(0.210);
-                sleep(450);
+                arm.setPosition(0);
+                sleep(650);
                 claw.setPower(0);
                 sleep(100);
-                arm.setPosition(0.16);
+                arm.setPosition(0.23);
                 drive.followTrajectory(grabReturn1);
                 claw.setPower(1);
                 wrist.setPosition(0.2);
-                arm.setPosition(0);
+                arm.setPosition(1);
                 sleep(250);
-                arm.setPosition(0.16);
+                arm.setPosition(0.23);
                 drive.followTrajectory(grabRed2);
-                arm.setPosition(0.210);
-                sleep(450);
+                arm.setPosition(0);
+                sleep(650);
                 claw.setPower(0);
                 sleep(100);
-                arm.setPosition(0.16);
+                arm.setPosition(0.23);
                 drive.followTrajectory(grabReturn2);
                 claw.setPower(1);
                 sleep(250);
-                arm.setPosition(0);
+                arm.setPosition(1);
+                drive.followTrajectory(switchGrab);
                 drive.followTrajectory(grabThatThang);
                 //sleep(250);
                 while(liftEncoder.getCurrentPosition() > -2675){
