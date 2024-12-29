@@ -181,13 +181,20 @@ public class Voltanomous extends LinearOpMode {
 
         Pose2d redSample1 = new Pose2d(-48, -18, Math.toRadians(-90));
         Pose2d redSample2 = new Pose2d(-56, -19, Math.toRadians(-90));
+        Pose2d yellowSample1 = new Pose2d(59, -21, Math.toRadians(-90));
+        Pose2d yellowSample2 = new Pose2d(68.5, -21, Math.toRadians(-90));
+        Pose2d yellowSample3 = new Pose2d(56, -35, Math.toRadians(0));
+        Pose2d preDrop = new Pose2d(56, -9, Math.toRadians(45));
+        Pose2d drop = new Pose2d(66, -3, Math.toRadians(45));
         Pose2d preGrab = new Pose2d(-32, -4, Math.toRadians(-190));
         Pose2d prePreGrab = new Pose2d(-32, -10, Math.toRadians(-180));
         Pose2d grab = new Pose2d(-32, 2, Math.toRadians(-180));
         switch(position){
             case Left:
                 startPose = new Pose2d(41, 0, 0);
-                endPose = new Pose2d(41, 0, 0);
+                endPose = new Pose2d(32, -57, Math.toRadians(-90));
+                claw.setPower(1);
+                arm.setPosition(1);
                 break;
             case Right:
                 startPose = new Pose2d(-15, 0, 0);
@@ -200,7 +207,38 @@ public class Voltanomous extends LinearOpMode {
         telemetry.update();
 
         drive.setPoseEstimate(startPose);
-
+        //left side
+        Trajectory Drop = drive.trajectoryBuilder(preDrop)
+                .lineToLinearHeading(drop)
+                .build();
+        Trajectory antiDrop = drive.trajectoryBuilder(drop)
+                .lineToLinearHeading(preDrop)
+                .build();
+        Trajectory toDrop1 = drive.trajectoryBuilder(startPose)
+                .lineToLinearHeading(preDrop)
+                .build();
+        Trajectory toGrab1 = drive.trajectoryBuilder(preDrop)
+                .lineToLinearHeading(yellowSample1)
+                .build();
+        Trajectory toDrop2 = drive.trajectoryBuilder(yellowSample1)
+                .lineToLinearHeading(preDrop)
+                .build();
+        Trajectory toGrab2 = drive.trajectoryBuilder(preDrop)
+                .lineToLinearHeading(yellowSample2)
+                .build();
+        Trajectory toDrop3 = drive.trajectoryBuilder(yellowSample2)
+                .lineToLinearHeading(preDrop)
+                .build();
+        Trajectory toGrab3 = drive.trajectoryBuilder(preDrop)
+                .lineToLinearHeading(yellowSample3)
+                .build();
+        Trajectory toDrop4 = drive.trajectoryBuilder(yellowSample3)
+                .lineToLinearHeading(preDrop)
+                .build();
+        Trajectory parkLeft = drive.trajectoryBuilder(preDrop)
+                .splineToLinearHeading(endPose, Math.toRadians(90))
+                .build();
+        //right side
         Trajectory toCenter = drive.trajectoryBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(0, 0, 0))
                 .build();
@@ -243,6 +281,9 @@ public class Voltanomous extends LinearOpMode {
         Trajectory toBar2 = drive.trajectoryBuilder(grab)
                 .splineToSplineHeading(new Pose2d(-9, -31.5, Math.toRadians(0)), Math.toRadians(-90))
                 .build();
+        Trajectory toBar3 = drive.trajectoryBuilder(grab)
+                .splineToSplineHeading(new Pose2d(-11.5, -31.5, Math.toRadians(0)), Math.toRadians(-90))
+                .build();
         selectStartingDelay();
 
         telemetry.clearAll();
@@ -258,37 +299,247 @@ public class Voltanomous extends LinearOpMode {
         sleep(delay);
 
         //drive.followTrajectory(toCenter);
-        while(liftEncoder.getCurrentPosition() > -2675){
-            lift1.setPower(1);
-            lift2.setPower(1);
-        }
-        lift1.setPower(0);
-        lift2.setPower(0);
-        drive.followTrajectory(toBarSpeed);
-        while(liftEncoder.getCurrentPosition() < -1500){
-            lift1.setPower(-1);
-            lift2.setPower(-1);
-        }
-        lift1.setPower(0);
-        lift2.setPower(0);
-        drive.followTrajectory(awayFromBar);
-        drive.followTrajectory(returnStart);
-        while(!down.isPressed()){
-            lift1.setPower(-1);
-            lift2.setPower(-1);
-        }
-        lift1.setPower(0);
-        lift2.setPower(0);
+
         switch(position){
             case Left:
+                claw.setPower(1);
+                wrist.setPosition(0.2);
+                lift1.setPower(1);
+                lift2.setPower(1);
+                drive.followTrajectoryAsync(toDrop1);
+                while(!up.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!up.isPressed()){
+                        lift1.setPower(1);
+                        lift2.setPower(1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                drive.followTrajectory(Drop);
+                claw.setPower(0);
+                sleep(400);
+                drive.followTrajectory(antiDrop);
+                arm.setPosition(0);
+                wrist.setPosition(0.8);
+                lift1.setPower(-1);
+                lift2.setPower(-1);
+                drive.followTrajectoryAsync(toGrab1);
+                while(!down.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                wrist.setPosition(0.8);
+                arm.setPosition(0);
+                sleep(400);
+                claw.setPower(1);
+                sleep(100);
+                arm.setPosition(1);
+                wrist.setPosition(0.2);
+                lift1.setPower(1);
+                lift2.setPower(1);
+                drive.followTrajectoryAsync(toDrop2);
+                while(!up.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!up.isPressed()){
+                        lift1.setPower(1);
+                        lift2.setPower(1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                drive.followTrajectory(Drop);
+                claw.setPower(0);
+                sleep(400);
+                drive.followTrajectory(antiDrop);
+                arm.setPosition(0);
+                wrist.setPosition(0.8);
+                lift1.setPower(-1);
+                lift2.setPower(-1);
+                drive.followTrajectoryAsync(toGrab2);
+                while(!down.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                wrist.setPosition(0.8);
+                arm.setPosition(0);
+                sleep(400);
+                claw.setPower(1);
+                sleep(100);
+                arm.setPosition(1);
+                wrist.setPosition(0.2);
+                lift1.setPower(1);
+                lift2.setPower(1);
+                drive.followTrajectoryAsync(toDrop3);
+                while(!up.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!up.isPressed()){
+                        lift1.setPower(1);
+                        lift2.setPower(1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                drive.followTrajectory(Drop);
+                claw.setPower(0);
+                sleep(400);
+                drive.followTrajectory(antiDrop);
+                arm.setPosition(0);
+                wrist.setPosition(0.2);
+                lift1.setPower(-1);
+                lift2.setPower(-1);
+                drive.followTrajectoryAsync(toGrab3);
+                while(!down.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                wrist.setPosition(0.2);
+                arm.setPosition(0);
+                sleep(400);
+                claw.setPower(1);
+                sleep(100);
+                arm.setPosition(1);
+                wrist.setPosition(0.2);
+                lift1.setPower(1);
+                lift2.setPower(1);
+                drive.followTrajectoryAsync(toDrop4);
+                while(!up.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!up.isPressed()){
+                        lift1.setPower(1);
+                        lift2.setPower(1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                drive.followTrajectory(Drop);
+                claw.setPower(0);
+                sleep(400);
+                drive.followTrajectory(antiDrop);
+                lift1.setPower(-1);
+                lift2.setPower(-1);
+                drive.followTrajectoryAsync(parkLeft);
+                while(liftEncoder.getCurrentPosition() < -1850 || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(liftEncoder.getCurrentPosition() < -1850){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
                 break;
             case Right:
+                drive.followTrajectoryAsync(toBarSpeed);
+                while(liftEncoder.getCurrentPosition() > -2675 || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(liftEncoder.getCurrentPosition() > -2675){
+                        lift1.setPower(1);
+                        lift2.setPower(1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                while(liftEncoder.getCurrentPosition() < -1500){
+                    lift1.setPower(-1);
+                    lift2.setPower(-1);
+                }
+                lift1.setPower(-1);
+                lift2.setPower(-1);
+                drive.followTrajectoryAsync(awayFromBar);
+                while(drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                drive.followTrajectoryAsync(returnStart);
+                while(!down.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
                 wrist.setPosition(0.2);
                 claw.setPower(1);
                 arm.setPosition(0.23);
                 drive.followTrajectory(grabRed1);
                 arm.setPosition(0);
-                sleep(650);
+                sleep(500);
                 claw.setPower(0);
                 sleep(100);
                 arm.setPosition(0.23);
@@ -300,7 +551,7 @@ public class Voltanomous extends LinearOpMode {
                 arm.setPosition(0.23);
                 drive.followTrajectory(grabRed2);
                 arm.setPosition(0);
-                sleep(650);
+                sleep(500);
                 claw.setPower(0);
                 sleep(100);
                 arm.setPosition(0.23);
@@ -311,37 +562,112 @@ public class Voltanomous extends LinearOpMode {
                 drive.followTrajectory(switchGrab);
                 drive.followTrajectory(grabThatThang);
                 //sleep(250);
-                while(liftEncoder.getCurrentPosition() > -2675){
+                while(liftEncoder.getCurrentPosition() > -500){
                     lift1.setPower(1);
                     lift2.setPower(1);
                 }
-                lift1.setPower(0);
-                lift2.setPower(0);
-                drive.followTrajectory(toBar2);
-                /* while(liftEncoder.getCurrentPosition() > -2900){
-                    lift1.setPower(1);
-                    lift2.setPower(1);
+                lift1.setPower(1);
+                lift2.setPower(1);
+                drive.followTrajectoryAsync(toBar2);
+                while(liftEncoder.getCurrentPosition() > -2675 || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(liftEncoder.getCurrentPosition() > -2675){
+                        lift1.setPower(1);
+                        lift2.setPower(1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
                 }
-                lift1.setPower(0);
-                lift2.setPower(0);
-                drive.followTrajectory(toBar);
-                 */
                 while(liftEncoder.getCurrentPosition() < -1500){
                     lift1.setPower(-1);
                     lift2.setPower(-1);
                 }
                 lift1.setPower(0);
                 lift2.setPower(0);
-                drive.followTrajectory(awayFromBar);
-                while(!down.isPressed()){
+                drive.followTrajectoryAsync(awayFromBar);
+                while(drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                drive.followTrajectoryAsync(grabReturn3);
+                while(!down.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                lift1.setPower(0);
+                lift2.setPower(0);
+                claw.setPower(1);
+                drive.followTrajectory(grabThatThang);
+                while(liftEncoder.getCurrentPosition() > -500){
+                    lift1.setPower(1);
+                    lift2.setPower(1);
+                }
+                lift1.setPower(1);
+                lift2.setPower(1);
+                drive.followTrajectoryAsync(toBar3);
+                while(liftEncoder.getCurrentPosition() > -2675 || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(liftEncoder.getCurrentPosition() > -2675){
+                        lift1.setPower(1);
+                        lift2.setPower(1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                while(liftEncoder.getCurrentPosition() < -1500){
                     lift1.setPower(-1);
                     lift2.setPower(-1);
                 }
                 lift1.setPower(0);
                 lift2.setPower(0);
-                drive.followTrajectory(grabReturn3);
-                claw.setPower(1);
-                drive.followTrajectory(grabThatThang);
+                drive.followTrajectoryAsync(awayFromBar);
+                while(drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
+                drive.followTrajectoryAsync(grabReturn3);
+                while(!down.isPressed() || drive.isBusy()){
+                    if(drive.isBusy()){
+                        drive.update();
+                    }
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
+                    } else {
+                        lift1.setPower(0);
+                        lift2.setPower(0);
+                    }
+                }
                 break;
         }
         runtime.reset();
