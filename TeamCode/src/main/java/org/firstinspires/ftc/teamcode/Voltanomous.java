@@ -186,9 +186,9 @@ public class Voltanomous extends LinearOpMode {
         Pose2d colorSample1 = new Pose2d(-40, -40, Math.toRadians(-90));
         Pose2d colorSample2 = new Pose2d(-49, -40, Math.toRadians(-90));
         Pose2d colorSample3 = new Pose2d(-58, -40, Math.toRadians(-90));
-        Pose2d yellowSample1 = new Pose2d(59, -21, Math.toRadians(-90));
+        Pose2d yellowSample1 = new Pose2d(58, -21, Math.toRadians(-90));
         Pose2d yellowSample2 = new Pose2d(68.5, -21, Math.toRadians(-90));
-        Pose2d yellowSample3 = new Pose2d(56.5, -35, Math.toRadians(0));
+        Pose2d yellowSample3 = new Pose2d(57, -35, Math.toRadians(0));
         Pose2d preDrop = new Pose2d(56, -9, Math.toRadians(45));
         Pose2d drop = new Pose2d(66, -3, Math.toRadians(45));
         Pose2d hook1 = new Pose2d(-14, -32, Math.toRadians(0));
@@ -619,29 +619,19 @@ public class Voltanomous extends LinearOpMode {
                 }
                 lift1.setPower(-1);
                 lift2.setPower(-1);
-                drive.followTrajectory(preGrab2);
-                drive.followTrajectory(grab2);
-                drive.followTrajectoryAsync(toBar3);
-                while(liftEncoder.getCurrentPosition() > -2600 || drive.isBusy()){
+                drive.followTrajectoryAsync(preGrab2);
+                while((!down.isPressed() || drive.isBusy()) && opModeIsActive()){
                     if(drive.isBusy()){
                         drive.update();
                     }
-                    if(liftEncoder.getCurrentPosition() > -2600){
-                        lift1.setPower(1);
-                        lift2.setPower(1);
+                    if(!down.isPressed()){
+                        lift1.setPower(-1);
+                        lift2.setPower(-1);
                     } else {
                         lift1.setPower(0);
                         lift2.setPower(0);
                     }
                 }
-                lift1.setPower(0);
-                lift2.setPower(0);
-                while(liftEncoder.getCurrentPosition() < -1500){
-                    lift1.setPower(-1);
-                    lift2.setPower(-1);
-                }
-                lift1.setPower(0);
-                lift2.setPower(0);
                 /*
                 claw.setPower(1);
                 sleep(250);
