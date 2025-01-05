@@ -241,7 +241,7 @@ public class VoltaTeleOp extends LinearOpMode {
             arm.setPosition(armPower);
             c.setPower(cr);
             w.setPosition(wr);
-            e.setPosition(ex);
+            e.setPosition(1 - ex);
             l.setPower(-Math.min(Math.max(li,ls),lds));
             l2.setPower(Math.min(Math.max(li,ls),lds));
             // Show the elapsed game time and wheel power.
