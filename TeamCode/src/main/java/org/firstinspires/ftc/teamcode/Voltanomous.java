@@ -191,9 +191,9 @@ public class Voltanomous extends LinearOpMode {
         Pose2d yellowSample3 = new Pose2d(57, -35, Math.toRadians(0));
         Pose2d preDrop = new Pose2d(56, -9, Math.toRadians(45));
         Pose2d drop = new Pose2d(66, -3, Math.toRadians(45));
-        Pose2d hook1 = new Pose2d(-14, -32, Math.toRadians(0));
-        Pose2d hook2 = new Pose2d(-10, -32, Math.toRadians(-360));
-        Pose2d hook3 = new Pose2d(-6, -32, Math.toRadians(-360));
+        Pose2d hook1 = new Pose2d(-14, -33, Math.toRadians(0));
+        Pose2d hook2 = new Pose2d(-10, -33, Math.toRadians(-360));
+        Pose2d hook3 = new Pose2d(-6, -33, Math.toRadians(-360));
         Pose2d hook4 = new Pose2d(-2, -32, Math.toRadians(-360));
         Pose2d dropGrabbed1 = new Pose2d(-40, 0, Math.toRadians(-90));
         Pose2d dropGrabbed2 = new Pose2d(-49, 0, Math.toRadians(-90));
