@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -93,11 +94,11 @@ public class VoltaTeleOp extends LinearOpMode {
     private DcMotor l2 = null;
     private Encoder leftEncoder,rightEncoder, frontEncoder;
     private double ls = -1,lds = 1,mult = 1;
+    private ColorSensor colorSensor;
     @Override
     public void runOpMode() {
-        //huzzah, my good men
-
-
+        colorSensor = hardwareMap.get(ColorSensor.class, "color");
+        colorSensor.enableLed(true);
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "flw");
@@ -240,7 +241,7 @@ public class VoltaTeleOp extends LinearOpMode {
             arm.setPosition(armPower);
             c.setPower(cr);
             w.setPosition(wr);
-            e.setPosition(ex);
+            e.setPosition(1 - ex);
             l.setPower(-Math.min(Math.max(li,ls),lds));
             l2.setPower(Math.min(Math.max(li,ls),lds));
             // Show the elapsed game time and wheel power.
