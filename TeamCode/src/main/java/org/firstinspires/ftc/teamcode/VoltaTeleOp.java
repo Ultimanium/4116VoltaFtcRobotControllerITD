@@ -229,7 +229,6 @@ public class VoltaTeleOp extends LinearOpMode {
             long curTime = System.nanoTime() - startTime;
 
             float curSec = curTime / 30000000f;
-
             wr += ((float)wrv / 150);
             wr = Math.max(wr,0.2f);
             wr = Math.min(wr,0.8f);
