@@ -292,7 +292,7 @@ public class Voltanomous extends LinearOpMode {
                 .build();
 
         Trajectory toBar1 = drive.trajectoryBuilder(grabSamples1.end())
-                .splineToLinearHeading(hook2, Math.toRadians(-90))
+                .lineToLinearHeading(hook2)
                 .build();
         Trajectory preGrab1 = drive.trajectoryBuilder(toBar1.end())
                 .lineToLinearHeading(prePreGrab)
@@ -301,7 +301,7 @@ public class Voltanomous extends LinearOpMode {
                 .lineToLinearHeading(grab)
                 .build();
         Trajectory toBar2 = drive.trajectoryBuilder(grab1.end())
-                .splineToLinearHeading(hook3, Math.toRadians(-90))
+                .lineToLinearHeading(hook3)
                 .build();
         Trajectory preGrab2 = drive.trajectoryBuilder(toBar2.end())
                 .lineToLinearHeading(prePreGrab)
@@ -310,7 +310,7 @@ public class Voltanomous extends LinearOpMode {
                 .lineToLinearHeading(grab)
                 .build();
         Trajectory toBar3 = drive.trajectoryBuilder(grab2.end())
-                .splineToLinearHeading(hook4, Math.toRadians(-90))
+                .lineToLinearHeading(hook4)
                 .build();
         /*
         Trajectory switchGrab = drive.trajectoryBuilder(dropGrabbed)
