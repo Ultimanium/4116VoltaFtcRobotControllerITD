@@ -95,6 +95,7 @@ public class VoltaTeleOp extends LinearOpMode {
     private Encoder leftEncoder,rightEncoder, frontEncoder;
     private double ls = -1,lds = 1,mult = 1;
     private ColorSensor colorSensor;
+    private DcMotor hang = null;
     @Override
     public void runOpMode() {
         colorSensor = hardwareMap.get(ColorSensor.class, "color");
@@ -113,7 +114,7 @@ public class VoltaTeleOp extends LinearOpMode {
         e = hardwareMap.get(Servo.class, "e");
         up = hardwareMap.get(TouchSensor.class, "UpS");
         down = hardwareMap.get(TouchSensor.class, "DoS");
-
+        hang = hardwareMap.get(DcMotor.class, "hang");
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l2"));
 
         // ########################################################################################
@@ -164,6 +165,8 @@ public class VoltaTeleOp extends LinearOpMode {
             double wrv = gamepad2.right_stick_x;
             double cr = gamepad2.left_trigger;
             double ex = 1 - gamepad2.right_trigger;
+            double hp = gamepad1.right_trigger;
+            double hpo = gamepad1.left_trigger;
             double li = gamepad2.left_stick_y;
             if(ex<0){
                 ex=0;
@@ -209,6 +212,7 @@ public class VoltaTeleOp extends LinearOpMode {
                 rightBackPower  /= max;
             }
 
+
             // This is test code:
             //
             // Uncomment the following code to test your motor directions.
@@ -244,6 +248,7 @@ public class VoltaTeleOp extends LinearOpMode {
             e.setPosition(1 - ex);
             l.setPower(-Math.min(Math.max(li,ls),lds));
             l2.setPower(Math.min(Math.max(li,ls),lds));
+            hang.setPower(hp - hpo);
             // Show the elapsed game time and wheel power.
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
