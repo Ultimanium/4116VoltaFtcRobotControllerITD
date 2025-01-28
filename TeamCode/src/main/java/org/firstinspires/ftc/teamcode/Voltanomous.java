@@ -640,6 +640,7 @@ public class Voltanomous extends LinearOpMode {
                         lift2.setPower(0);
                     }
                 }
+                //prev code
                 /*
                 claw.setPower(1);
                 sleep(250);

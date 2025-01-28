@@ -97,6 +97,7 @@ public class VoltaTeleOp extends LinearOpMode {
     private ColorSensor colorSensor;
     private DcMotor hang = null;
     @Override
+    //TeleOp
     public void runOpMode() {
         colorSensor = hardwareMap.get(ColorSensor.class, "color");
         colorSensor.enableLed(true);
