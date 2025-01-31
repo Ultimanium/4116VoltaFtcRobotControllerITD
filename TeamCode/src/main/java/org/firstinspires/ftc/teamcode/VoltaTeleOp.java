@@ -127,7 +127,7 @@ public class VoltaTeleOp extends LinearOpMode {
         // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
         // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
         // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
+        // Keep testing unti ALL the wheels move the robot forward when you push the left joystick forward.
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -242,13 +242,13 @@ public class VoltaTeleOp extends LinearOpMode {
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+            rightBackDrive.setPower(-rightBackPower);
             arm.setPosition(armPower);
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(1 - ex);
             l.setPower(-Math.min(Math.max(li,ls),lds));
-            l2.setPower(Math.min(Math.max(li,ls),lds));
+            l2.setPower(-Math.min(Math.max(li,ls),lds));
             hang.setPower(hp - hpo);
             // Show the elapsed game time and wheel power.
 
