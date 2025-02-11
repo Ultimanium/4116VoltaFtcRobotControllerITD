@@ -148,7 +148,7 @@ public class VoltaTeleOp extends LinearOpMode {
         boolean toggleR = false;
         boolean toggleL = false;
         // run until the end of the match (driver presses STOP)
-        float wr = 0.8f;
+        float wr = 0.1f;
         while (opModeIsActive()) {
             long startTime = System.nanoTime();
             double max;
@@ -163,7 +163,7 @@ public class VoltaTeleOp extends LinearOpMode {
             double lateral =  gamepad1.left_stick_x + rm;
             double yaw     =  gamepad1.right_stick_x;
             double speed= 0.75;
-            double wrv = gamepad2.right_stick_x;
+            double wrv = -gamepad2.right_stick_x;
             double cr = gamepad2.left_trigger;
             double ex = 1 - gamepad2.right_trigger;
             double hp = gamepad1.right_trigger;
@@ -247,8 +247,8 @@ public class VoltaTeleOp extends LinearOpMode {
 
             float curSec = curTime / 30000000f;
             wr += ((float)wrv / 150);
-            wr = Math.max(wr,0.2f);
-            wr = Math.min(wr,0.8f);
+            wr = Math.max(wr,0.1f);
+            wr = Math.min(wr,0.6f);
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
