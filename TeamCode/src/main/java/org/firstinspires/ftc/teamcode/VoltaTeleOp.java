@@ -169,6 +169,9 @@ public class VoltaTeleOp extends LinearOpMode {
             double hp = gamepad1.right_trigger;
             double hpo = gamepad1.left_trigger;
             double li = gamepad2.left_stick_y;
+            if(gamepad2.left_stick_y == 0){
+                li = 0.5;
+            }
             if(ex<0){
                 ex=0;
             }
