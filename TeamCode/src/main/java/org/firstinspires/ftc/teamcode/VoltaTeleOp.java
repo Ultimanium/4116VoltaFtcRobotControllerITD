@@ -168,9 +168,17 @@ public class VoltaTeleOp extends LinearOpMode {
             double ex = 1 - gamepad2.right_trigger;
             double hp = gamepad1.right_trigger;
             double hpo = gamepad1.left_trigger;
-            double li = gamepad2.left_stick_y;
+            double l0 = 1;
+            double ll = 0;
+            double l1 = 1;
+            double li = gamepad2.left_stick_y + (ll * l1) * l0;
             if(gamepad2.left_stick_y == 0){
-                li = 0.5;
+                ll = -0.1;
+            }
+            if (down.isPressed()){l1 = 0;}
+            if(gamepad2.left_stick_y < 1){
+                l0 = 0.5;
+            } else {l0 = 1;
             }
             if(ex<0){
                 ex=0;
@@ -203,6 +211,7 @@ public class VoltaTeleOp extends LinearOpMode {
 
             if(down.isPressed()){
                 lds = 0;
+
             }
             else {
                 lds = 1;
