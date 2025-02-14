@@ -185,9 +185,9 @@ public class Voltanomous extends LinearOpMode {
         Pose2d colorSample1 = new Pose2d(-40, -40, Math.toRadians(-90));
         Pose2d colorSample2 = new Pose2d(-49, -40, Math.toRadians(-90));
         Pose2d colorSample3 = new Pose2d(-58, -40, Math.toRadians(-90));
-        Pose2d yellowSample1 = new Pose2d(58.5, -21, Math.toRadians(-90));
-        Pose2d yellowSample2 = new Pose2d(69, -21, Math.toRadians(-90));
-        Pose2d yellowSample3 = new Pose2d(57.5, -35, Math.toRadians(0));
+        Pose2d yellowSample1 = new Pose2d(57, -20, Math.toRadians(-90));
+        Pose2d yellowSample2 = new Pose2d(68, -20.5, Math.toRadians(-90));
+        Pose2d yellowSample3 = new Pose2d(56.5, -35.5, Math.toRadians(0));
         Pose2d preDrop = new Pose2d(56, -9, Math.toRadians(45));
         Pose2d drop = new Pose2d(65.5, -3.5, Math.toRadians(45));
         Pose2d hook1 = new Pose2d(-14, -23, Math.toRadians(0));
@@ -366,18 +366,17 @@ public class Voltanomous extends LinearOpMode {
                         lift1.setPower(1);
                         lift2.setPower(1);
                     } else {
-                        lift1.setPower(0);
-                        lift2.setPower(0);
+                        lift1.setPower(0.1);
+                        lift2.setPower(0.1);
                     }
                 }
-                lift1.setPower(0);
-                lift2.setPower(0);
+                lift1.setPower(0.1);
+                lift2.setPower(0.1);
                 drive.followTrajectory(Drop1);
                 sleep(200);
                 claw.setPower(0);
                 sleep(500);
                 drive.followTrajectory(antiDrop1);
-                arm.setPosition(0);
                 wrist.setPosition(0.8);
                 lift1.setPower(-1);
                 lift2.setPower(-1);
@@ -387,8 +386,8 @@ public class Voltanomous extends LinearOpMode {
                         drive.update();
                     }
                     if(!down.isPressed()){
-                        lift1.setPower(-1);
-                        lift2.setPower(-1);
+                        lift1.setPower(-0.1);
+                        lift2.setPower(-0.1);
                     } else {
                         lift1.setPower(0);
                         lift2.setPower(0);
@@ -398,7 +397,7 @@ public class Voltanomous extends LinearOpMode {
                 lift2.setPower(0);
                 wrist.setPosition(0.8);
                 arm.setPosition(0);
-                sleep(400);
+                sleep(1400);
                 claw.setPower(1);
                 sleep(100);
                 arm.setPosition(1);
@@ -414,18 +413,17 @@ public class Voltanomous extends LinearOpMode {
                         lift1.setPower(1);
                         lift2.setPower(1);
                     } else {
-                        lift1.setPower(0);
-                        lift2.setPower(0);
+                        lift1.setPower(0.1);
+                        lift2.setPower(0.1);
                     }
                 }
-                lift1.setPower(0);
-                lift2.setPower(0);
+                lift1.setPower(0.1);
+                lift2.setPower(0.1);
                 drive.followTrajectory(Drop2);
                 sleep(200);
                 claw.setPower(0);
                 sleep(500);
                 drive.followTrajectory(antiDrop2);
-                arm.setPosition(0);
                 wrist.setPosition(0.8);
                 lift1.setPower(-1);
                 lift2.setPower(-1);
@@ -435,8 +433,8 @@ public class Voltanomous extends LinearOpMode {
                         drive.update();
                     }
                     if(!down.isPressed()){
-                        lift1.setPower(-1);
-                        lift2.setPower(-1);
+                        lift1.setPower(-0.1);
+                        lift2.setPower(-0.1);
                     } else {
                         lift1.setPower(0);
                         lift2.setPower(0);
@@ -446,7 +444,7 @@ public class Voltanomous extends LinearOpMode {
                 lift2.setPower(0);
                 wrist.setPosition(0.8);
                 arm.setPosition(0);
-                sleep(400);
+                sleep(1400);
                 claw.setPower(1);
                 sleep(100);
                 arm.setPosition(1);
@@ -462,18 +460,17 @@ public class Voltanomous extends LinearOpMode {
                         lift1.setPower(1);
                         lift2.setPower(1);
                     } else {
-                        lift1.setPower(0);
-                        lift2.setPower(0);
+                        lift1.setPower(0.1);
+                        lift2.setPower(0.1);
                     }
                 }
-                lift1.setPower(0);
-                lift2.setPower(0);
+                lift1.setPower(0.1);
+                lift2.setPower(0.1);
                 drive.followTrajectory(Drop3);
                 sleep(200);
                 claw.setPower(0);
                 sleep(500);
                 drive.followTrajectory(antiDrop3);
-                arm.setPosition(0);
                 wrist.setPosition(0.2);
                 lift1.setPower(-1);
                 lift2.setPower(-1);
@@ -483,8 +480,8 @@ public class Voltanomous extends LinearOpMode {
                         drive.update();
                     }
                     if(!down.isPressed()){
-                        lift1.setPower(-1);
-                        lift2.setPower(-1);
+                        lift1.setPower(-0.1);
+                        lift2.setPower(-0.1);
                     } else {
                         lift1.setPower(0);
                         lift2.setPower(0);
@@ -494,7 +491,7 @@ public class Voltanomous extends LinearOpMode {
                 lift2.setPower(0);
                 wrist.setPosition(0.2);
                 arm.setPosition(0);
-                sleep(400);
+                sleep(1400);
                 claw.setPower(1);
                 sleep(100);
                 arm.setPosition(1);
@@ -510,12 +507,12 @@ public class Voltanomous extends LinearOpMode {
                         lift1.setPower(1);
                         lift2.setPower(1);
                     } else {
-                        lift1.setPower(0);
-                        lift2.setPower(0);
+                        lift1.setPower(0.1);
+                        lift2.setPower(0.1);
                     }
                 }
-                lift1.setPower(0);
-                lift2.setPower(0);
+                lift1.setPower(0.1);
+                lift2.setPower(0.1);
                 drive.followTrajectory(Drop4);
                 sleep(200);
                 claw.setPower(0);
@@ -524,16 +521,16 @@ public class Voltanomous extends LinearOpMode {
                 lift1.setPower(-1);
                 lift2.setPower(-1);
                 drive.followTrajectoryAsync(parkLeft);
-                while(liftEncoder.getCurrentPosition() < -971 || drive.isBusy()){
+                while(liftEncoder.getCurrentPosition() < -509 || drive.isBusy()){
                     if(drive.isBusy()){
                         drive.update();
                     }
-                    if(liftEncoder.getCurrentPosition() < -971){
-                        lift1.setPower(-1);
-                        lift2.setPower(-1);
+                    if(liftEncoder.getCurrentPosition() < -1209){
+                        lift1.setPower(-0.1);
+                        lift2.setPower(-0.1);
                     } else {
-                        lift1.setPower(0);
-                        lift2.setPower(0);
+                        lift1.setPower(0.1);
+                        lift2.setPower(0.1);
                     }
                 }
                 lift1.setPower(0);

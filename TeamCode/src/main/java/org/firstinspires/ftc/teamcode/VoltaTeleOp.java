@@ -92,7 +92,7 @@ public class VoltaTeleOp extends LinearOpMode {
     private Servo e = null;
     private DcMotor l = null;
     private DcMotor l2 = null;
-    private Encoder leftEncoder,rightEncoder, frontEncoder;
+    private Encoder leftEncoder, rightEncoder, frontEncoder;
     private double ls = -1,lds = 1,mult = 1;
     private ColorSensor colorSensor;
     private DcMotor hang = null;
@@ -107,6 +107,11 @@ public class VoltaTeleOp extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "blw");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frw");
         rightBackDrive = hardwareMap.get(DcMotor.class, "brw");
+
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "brw"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frw"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l"));
+
         arm = hardwareMap.get(Servo.class, "arm");
         c = hardwareMap.get(CRServo.class, "c");
         w = hardwareMap.get(Servo.class, "w");
@@ -116,7 +121,7 @@ public class VoltaTeleOp extends LinearOpMode {
         up = hardwareMap.get(TouchSensor.class, "UpS");
         down = hardwareMap.get(TouchSensor.class, "DoS");
         hang = hardwareMap.get(DcMotor.class, "hang");
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l2"));
+        //leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l2"));
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -263,7 +268,9 @@ public class VoltaTeleOp extends LinearOpMode {
             telemetry.addData("e", ex);
             telemetry.addData("l", li);
             telemetry.addData("Up",up.isPressed());
-            telemetry.addData("lift", leftEncoder.getCurrentPosition());
+            telemetry.addData("left", leftEncoder.getCurrentPosition());
+            telemetry.addData("right", rightEncoder.getCurrentPosition());
+            telemetry.addData("center", frontEncoder.getCurrentPosition());
             telemetry.addData("arm",armPower);  telemetry.update();
         }
     }
