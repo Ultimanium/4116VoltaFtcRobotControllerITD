@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -75,6 +76,7 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
 
 //testing purposes
 
+@Disabled
 @TeleOp(name="VoltaTeleOp", group="Linear OpMode")
 
 public class VoltaTeleOp extends LinearOpMode {
@@ -92,7 +94,7 @@ public class VoltaTeleOp extends LinearOpMode {
     private Servo e = null;
     private DcMotor l = null;
     private DcMotor l2 = null;
-    private Encoder leftEncoder, rightEncoder, frontEncoder;
+    private Encoder leftEncoder, rightEncoder, frontEncoder, liftEncoder;
     private double ls = -1,lds = 1,mult = 1;
     private ColorSensor colorSensor;
     private DcMotor hang = null;
@@ -111,6 +113,7 @@ public class VoltaTeleOp extends LinearOpMode {
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "brw"));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frw"));
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l"));
+        liftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l2"));
 
         arm = hardwareMap.get(Servo.class, "arm");
         c = hardwareMap.get(CRServo.class, "c");
@@ -264,8 +267,14 @@ public class VoltaTeleOp extends LinearOpMode {
             c.setPower(cr);
             w.setPosition(wr);
             e.setPosition(1 - ex);
-            l.setPower(-Math.min(Math.max(li,ls),lds) + 0.08);
-            l2.setPower(-Math.min(Math.max(li,ls),lds) + 0.08);
+            if(liftEncoder.getCurrentPosition() < -1100){
+                l.setPower(-Math.min(Math.max(li,ls),lds) + 0.1);
+                l2.setPower(-Math.min(Math.max(li,ls),lds) + 0.1);
+            } else {
+                l.setPower(-Math.min(Math.max(li,ls),lds));
+                l2.setPower(-Math.min(Math.max(li,ls),lds));
+            }
+
             hang.setPower(hp - hpo);
             // Show the elapsed game time and wheel power.
 
