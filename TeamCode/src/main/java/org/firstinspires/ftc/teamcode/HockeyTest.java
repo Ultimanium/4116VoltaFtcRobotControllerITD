@@ -13,7 +13,7 @@ public class HockeyTest extends LinearOpMode {
     private DcMotor left = null;
     private DcMotor right = null;
     private Servo push = null;
-    private DcMotor in = null
+    private DcMotor in = null;
     @Override
     public void runOpMode() {
         left = hardwareMap.get(DcMotor.class, "left");
