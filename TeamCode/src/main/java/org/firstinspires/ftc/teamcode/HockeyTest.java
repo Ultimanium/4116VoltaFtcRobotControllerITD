@@ -12,20 +12,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class HockeyTest extends LinearOpMode {
     private DcMotor left = null;
     private DcMotor right = null;
-    private DcMotor rleft = null;
-    private DcMotor rright = null;
     @Override
     public void runOpMode() {
         left = hardwareMap.get(DcMotor.class, "left");
         right = hardwareMap.get(DcMotor.class, "right");
-        rleft = hardwareMap.get(DcMotor.class, "rleft");
-        rright = hardwareMap.get(DcMotor.class, "rright");
         waitForStart();
         while (opModeIsActive()) {
             right.setPower(0.5);
             left.setPower(-0.5);
-            rright.setPower(1);
-            rleft.setPower(-1);
         }
     }
 
