@@ -43,6 +43,7 @@ public class ThirtyHourTeleOp extends LinearOpMode
     private DcMotor launchr = null;
     private Servo door = null;
     private DcMotor intake = null;
+    private Servo pivot = null;
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
@@ -69,6 +70,7 @@ public class ThirtyHourTeleOp extends LinearOpMode
         launchl = hardwareMap.get(DcMotor.class, "launchl");
         launchr = hardwareMap.get(DcMotor.class, "launchr");
         door = hardwareMap.get(Servo.class, "door");
+        pivot = hardwareMap.get(Servo.class, "pivot");
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
@@ -98,6 +100,12 @@ public class ThirtyHourTeleOp extends LinearOpMode
             }else{door.setPosition(0.65);}
             targetFound = false;
             desiredTag  = null;
+            if(gamepad2.x){
+              pivot.setPosition(0);
+            } else if (gamepad2.y) {
+                pivot.setPosition(0.2);
+            }
+
 
             // Step through the list of detected tags and look for a matching tag
             List<AprilTagDetection> currentDetections = aprilTag.getDetections();
