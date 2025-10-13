@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -37,8 +38,11 @@ public class ThirtyHourTeleOp extends LinearOpMode
     private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
     private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
-    private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
-
+    private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
+    private DcMotor launchl = null;
+    private DcMotor launchr = null;
+    private Servo door = null;
+    private DcMotor intake = null;
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
@@ -62,7 +66,9 @@ public class ThirtyHourTeleOp extends LinearOpMode
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
-
+        launchl = hardwareMap.get(DcMotor.class, "launchl");
+        launchr = hardwareMap.get(DcMotor.class, "launchr");
+        door = hardwareMap.get(Servo.class, "door");
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
@@ -82,6 +88,14 @@ public class ThirtyHourTeleOp extends LinearOpMode
 
         while (opModeIsActive())
         {
+            launchr.setPower(1);
+            launchl.setPower(-1);
+            if(gamepad2.right_bumper){
+                intake.setPower(1);
+            }else{intake.setPower(0);};
+            if(gamepad2.a){
+                door.setPosition(0.4);
+            }else{door.setPosition(0.65);}
             targetFound = false;
             desiredTag  = null;
 
