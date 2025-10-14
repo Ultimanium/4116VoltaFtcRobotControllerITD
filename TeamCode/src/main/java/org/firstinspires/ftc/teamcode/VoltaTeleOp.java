@@ -17,7 +17,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@TeleOp(name="ThirtyHourTeleOp", group = "ThirtyHour")
+@TeleOp(name="VoltaTeleOp", group = "idk")
 public class VoltaTeleOp extends LinearOpMode
 {
 
@@ -44,7 +44,7 @@ public class VoltaTeleOp extends LinearOpMode
     private Servo door = null;
     private DcMotor intake = null;
     private Servo pivot = null;
-   // Used to hold the data for a detected AprilTag
+    // Used to hold the data for a detected AprilTag
 
     @Override public void runOpMode()
     {
@@ -75,11 +75,13 @@ public class VoltaTeleOp extends LinearOpMode
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
 
-        telemetry.update();
+        // Wait for driver to press start
+
         waitForStart();
 
         while (opModeIsActive())
         {
+
             launchr.setPower(1);
             launchl.setPower(-1);
             if(gamepad2.right_bumper){
@@ -88,12 +90,15 @@ public class VoltaTeleOp extends LinearOpMode
             if(gamepad2.a){
                 door.setPosition(0.4);
             }else{door.setPosition(0.65);}
+
             if(gamepad2.x){
                 pivot.setPosition(0);
             } else if (gamepad2.y) {
                 pivot.setPosition(0.2);
             }
 
+
+            // Step through the list of detected tags and look for a matching tag
 
 
 
@@ -105,10 +110,9 @@ public class VoltaTeleOp extends LinearOpMode
             telemetry.update();
 
             // Apply desired axes motions to the drivetrain.
-            moveRobot(drive, strafe, turn);
-            sleep(10);
+
         }
-    }
+
 
     /**
      * Move robot according to desired axes motions
@@ -119,6 +123,7 @@ public class VoltaTeleOp extends LinearOpMode
      * <p>
      * Positive Yaw is counter-clockwise
      */
+    }
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
         double leftFrontPower    =  x -y -yaw;
@@ -158,6 +163,5 @@ public class VoltaTeleOp extends LinearOpMode
 
         // Set camera controls unless we are stopping.
 
-        }
 
-
+}
