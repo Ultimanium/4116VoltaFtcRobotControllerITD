@@ -26,12 +26,13 @@ public class HockeyTest extends LinearOpMode {
         out1 = hardwareMap.get(DcMotor.class, "launchl");
         flap = hardwareMap.get(Servo.class, "door");
         pivot = hardwareMap.get(Servo.class, "pivot");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
 
         waitForStart();
         while (opModeIsActive()) {
             if(gamepad2.right_bumper){
-                intake.setPower(1);
+                intake.setPower(0.4);
             }else{intake.setPower(0);}
             out.setPower(power);
             out1.setPower(-power);
