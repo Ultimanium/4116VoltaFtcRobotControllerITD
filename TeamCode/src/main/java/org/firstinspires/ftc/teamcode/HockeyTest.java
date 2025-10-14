@@ -31,9 +31,7 @@ public class HockeyTest extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            if(gamepad2.right_bumper){
-                intake.setPower(0.4);
-            }else{intake.setPower(0);}
+            intake.setPower(gamepad2.left_stick_y);
             out.setPower(power);
             out1.setPower(-power);
 
