@@ -1,291 +1,163 @@
-/* Copyright (c) 2021 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import org.firstinspires.ftc.teamcode.util.Encoder;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
-/*
- * This file contains an example of a Linear "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of  the FTC Driver Station.
- * When a selection is made from the menu, the corresponding OpMode is executed.
- *
- * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
- * This code will work with either a Mecanum-Drive or an X-Drive train.
- * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
- * Note that a Mecanum drive must display an X rol-
- * 9
- * -----
- *
- * ler-pattern when viewed from above.
- *
- * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
- *
- * Holonomic drives
- * provide the ability for the robot to move in three axes (directions) simultaneously.
- * Each motion axis is controlled by one Joystick axis.
- *
- * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
- * 2) Lateral:  Strafing right and left                     Left-joystick Right and Left
- * 3) Yaw:      Rotating Clockwise and counter clockwise    Right-joystick Right and Left
- *
- * This code is written assuming that the right-side motors need to be reversed for the robot to drive forward.
- * When you first test your robot, if it moves backward when you push the left stick forward, then you must flip
- * the direction of all 4 motors (see code below).
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
- */
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-//testing purposes
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-@Disabled
-@TeleOp(name="VoltaTeleOp", group="Linear OpMode")
+@TeleOp(name="ThirtyHourTeleOp", group = "ThirtyHour")
+public class VoltaTeleOp extends LinearOpMode
+{
 
-public class VoltaTeleOp extends LinearOpMode {
+    // Adjust these numbers to suit your robot.
+    final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
 
-    // Declare OpMode members for each of the 4 motors.
-    private ElapsedTime runtime = new ElapsedTime();
-    private TouchSensor up, down;
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
-    private Servo arm = null;
-    private CRServo c = null;
-    private Servo w = null;
-    private Servo e = null;
-    private DcMotor l = null;
-    private DcMotor l2 = null;
-    private Encoder leftEncoder, rightEncoder, frontEncoder;
-    private double ls = -1,lds = 1,mult = 1;
-    private ColorSensor colorSensor;
-    private DcMotor hang = null;
-    @Override
-    //TeleOp
-    public void runOpMode() {
-        colorSensor = hardwareMap.get(ColorSensor.class, "color");
-        colorSensor.enableLed(true);
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "flw");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "blw");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "frw");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "brw");
+    //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
+    //  applied to the drive motors to correct the error.
+    //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
+    final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". e.g. Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+    final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  e.g. Ramp up to 37% power at a 25 degree Yaw error.   (0.375 / 25.0)
+    final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "brw"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frw"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l"));
+    final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+    final double MAX_AUTO_STRAFE= 0.5;   //  Clip the strafing speed to this max value (adjust for your robot)
+    final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
 
-        arm = hardwareMap.get(Servo.class, "arm");
-        c = hardwareMap.get(CRServo.class, "c");
-        w = hardwareMap.get(Servo.class, "w");
-        l = hardwareMap.get(DcMotor.class, "l");
-        l2 = hardwareMap.get(DcMotor.class, "l2");
-        e = hardwareMap.get(Servo.class, "e");
-        up = hardwareMap.get(TouchSensor.class, "UpS");
-        down = hardwareMap.get(TouchSensor.class, "DoS");
-        hang = hardwareMap.get(DcMotor.class, "hang");
-        //leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "l2"));
+    private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
+    private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
+    private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
+    private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
+    private DcMotor launchl = null;
+    private DcMotor launchr = null;
+    private Servo door = null;
+    private DcMotor intake = null;
+    private Servo pivot = null;
+   // Used to hold the data for a detected AprilTag
 
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing unti ALL the wheels move the robot forward when you push the left joystick forward.
+    @Override public void runOpMode()
+    {
+        boolean targetFound     = false;    // Set to true when an AprilTag target is detected
+        double  drive           = 0;        // Desired forward power/speed (-1 to +1)
+        double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
+        double  turn            = 0;        // Desired turning power/speed (-1 to +1)
+
+        // Initialize the Apriltag Detection process
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must match the names assigned during the robot configuration.
+        // step (using the FTC Robot Controller app on the phone).
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
+        launchl = hardwareMap.get(DcMotor.class, "launchl");
+        launchr = hardwareMap.get(DcMotor.class, "launchr");
+        door = hardwareMap.get(Servo.class, "door");
+        pivot = hardwareMap.get(Servo.class, "pivot");
+        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
+        // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
+        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        l.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        l2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        // Wait for the game to start (driver presses PLAY)
-        telemetry.addData("Status", "Initialized");
+
+
         telemetry.update();
-
         waitForStart();
-        runtime.reset();
-        double armPower = 1;
-        boolean toggleR = false;
-        boolean toggleL = false;
-        // run until the end of the match (driver presses STOP)
-        float wr = 0.25f;
-        while (opModeIsActive()) {
-            long startTime = System.nanoTime();
-            double max;
-            if (gamepad2.a){armPower=0.23;}
-            if(gamepad2.x){armPower =0;}
-            if (gamepad2.b){armPower=1;}
-            double rm;
-            if(gamepad1.dpad_right){
-                rm = 1;
-            }else{rm=0;}
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x + rm;
-            double yaw     =  gamepad1.right_stick_x;
-            double speed= 0.75;
-            double wrv = -gamepad2.right_stick_x;
-            double cr = gamepad2.left_trigger;
-            double ex = 1 - gamepad2.right_trigger;
-            double hp = gamepad1.right_trigger;
-            double hpo = gamepad1.left_trigger;
-            double l0 = 1;
-            double ll = 0;
-            double l1 = 1;
-            if(gamepad2.left_stick_y == 0){
-                ll = -0.1;
-            }
-            double li = gamepad2.left_stick_y + ll;
-            if (down.isPressed()){l1 = 0;}else{l1 = 1;}
-            if(gamepad2.left_stick_y < 1){
-                l0 = 0.5;
-            } else {l0 = 1;
-            }
-            if(ex<0){
-                ex=0;
-            }
-            if (gamepad1.right_bumper){
-                speed = 0.325;
-            } else if(gamepad1.left_bumper){
-                speed = 1;
-            }else{
-                speed = 0.75;
-            }
 
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower  = (axial + lateral + yaw)*speed;
-            double rightFrontPower = (axial - lateral - yaw)*speed;
-            double leftBackPower   = (axial - lateral + yaw)*speed;
-            double rightBackPower  = (axial + lateral - yaw)*speed;
-            // Normalize the values so no wheel power exceeds 100%
-            // This ensures that the robot maintains the desired motion.
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-            if(up.isPressed()){
-                ls = 0;
-            }
-            else {
-                ls = -1;
-            }
-
-            if(down.isPressed()){
-                lds = 0;
-
-            }
-            else {
-                lds = 1;
-            }
-            if (gamepad1.left_bumper){speed = 0.5;}else if (gamepad1.right_bumper){speed = 1.5;}else{speed = 1;}
-            if(gamepad2.right_bumper){mult=1.8;} else {mult=1;}
-            if (max > 1.0) {
-                leftFrontPower  /= max;
-                rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
+        while (opModeIsActive())
+        {
+            launchr.setPower(1);
+            launchl.setPower(-1);
+            if(gamepad2.right_bumper){
+                intake.setPower(1);
+            }else{intake.setPower(0);};
+            if(gamepad2.a){
+                door.setPosition(0.4);
+            }else{door.setPosition(0.65);}
+            if(gamepad2.x){
+                pivot.setPosition(0);
+            } else if (gamepad2.y) {
+                pivot.setPosition(0.2);
             }
 
 
-            // This is test code:
-            //
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
 
-/*
-            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-*/
 
-            long curTime = System.nanoTime() - startTime;
+            // Tell the driver what we see, and what to do.
 
-            float curSec = curTime / 30000000f;
-            wr += ((float)wrv / 150);
-            wr = Math.max(wr,0.25f);
-            wr = Math.min(wr,0.6f);
 
-            // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(-rightBackPower);
-            arm.setPosition(armPower);
-            c.setPower(cr);
-            w.setPosition(wr);
-            e.setPosition(1 - ex);
-            l.setPower(-Math.min(Math.max(li,ls),lds) + 0.08);
-            l2.setPower(-Math.min(Math.max(li,ls),lds) + 0.08);
-            hang.setPower(hp - hpo);
-            // Show the elapsed game time and wheel power.
+            // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
 
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Arm", armPower);
-            telemetry.addData("c", cr);
-            telemetry.addData("w", wr);
-            telemetry.addData("wv", wrv);
-            telemetry.addData("loopTime", curTime / 3000000f);
-            telemetry.addData("e", ex);
-            telemetry.addData("l", li);
-            telemetry.addData("Up",up.isPressed());
-            telemetry.addData("left", leftEncoder.getCurrentPosition());
-            telemetry.addData("right", rightEncoder.getCurrentPosition());
-            telemetry.addData("center", frontEncoder.getCurrentPosition());
-            telemetry.addData("arm",armPower);  telemetry.update();
+            telemetry.update();
+
+            // Apply desired axes motions to the drivetrain.
+            moveRobot(drive, strafe, turn);
+            sleep(10);
         }
     }
-}
+
+    /**
+     * Move robot according to desired axes motions
+     * <p>
+     * Positive X is forward
+     * <p>
+     * Positive Y is strafe left
+     * <p>
+     * Positive Yaw is counter-clockwise
+     */
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower    =  x -y -yaw;
+        double rightFrontPower   =  x +y +yaw;
+        double leftBackPower     =  x +y -yaw;
+        double rightBackPower    =  x -y +yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        // Send powers to the wheels.
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+    }
+
+    /**
+     * Initialize the AprilTag processor.
+     */
+
+
+    /*
+     Manually set the camera gain and exposure.
+     This can only be called AFTER calling initAprilTag(), and only works for Webcams;
+    */
+
+
+        // Set camera controls unless we are stopping.
+
+        }
+
+
