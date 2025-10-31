@@ -12,21 +12,26 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class HockeyTest extends LinearOpMode {
     private DcMotor out = null;
     private DcMotor out1 = null;
-    public Servo flap = null;
+   // public Servo flap = null;
     public Servo pivot = null;
     public float power = 0;
     public boolean toggle = true;
     public float power1 = 0;
     public boolean toggle1 = true;
     private DcMotor intake = null;
+    private Servo kick = null;
+    private Servo wheel = null;
+
 
     @Override
     public void runOpMode() {
         out = hardwareMap.get(DcMotor.class, "launchr");
         out1 = hardwareMap.get(DcMotor.class, "launchl");
-        flap = hardwareMap.get(Servo.class, "door");
+       // flap = hardwareMap.get(Servo.class, "door");
         pivot = hardwareMap.get(Servo.class, "pivot");
         intake = hardwareMap.get(DcMotor.class, "intake");
+        kick = hardwareMap.get(Servo.class, "kick");
+        wheel = hardwareMap.get(Servo.class, "wheel");
 
 
         waitForStart();
@@ -38,12 +43,26 @@ public class HockeyTest extends LinearOpMode {
             telemetry.addData("Power", power);
             telemetry.addData("Pivot", pivot);
             telemetry.update();
+            if(gamepad2.x){
+                wheel.setPosition(0);
+            }
+            if(gamepad2.y){
+                wheel.setPosition(0.5);
+            }
+            if(gamepad2.b){
+                wheel.setPosition(1);
+            }
+            if(gamepad1.left_bumper){
+                kick.setPosition(0.4);
+            }else{
+                kick.setPosition(0.15);
+            }
 
-            if(gamepad2.a){
+     /*       if(gamepad2.a){
                 flap.setPosition(0.4);
             } else{
                 flap.setPosition(0.65);
-            }
+            }   */
 
             if(gamepad2.dpad_down && toggle){
                 toggle = false;
