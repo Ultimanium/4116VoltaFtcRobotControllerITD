@@ -41,7 +41,7 @@ public class ThirtyHourTeleOp extends LinearOpMode
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
     private DcMotor launchl = null;
     private DcMotor launchr = null;
-    private Servo door = null;
+   // private Servo door = null;
     private DcMotor intake = null;
     private Servo pivot = null;
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
@@ -49,7 +49,8 @@ public class ThirtyHourTeleOp extends LinearOpMode
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
-
+    private Servo kick = null;
+    private Servo wheel = null;
     @Override public void runOpMode()
     {
         boolean targetFound     = false;    // Set to true when an AprilTag target is detected
@@ -58,7 +59,7 @@ public class ThirtyHourTeleOp extends LinearOpMode
         double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
-        initAprilTag();
+        /* initAprilTag(); */
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must match the names assigned during the robot configuration.
@@ -69,8 +70,12 @@ public class ThirtyHourTeleOp extends LinearOpMode
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
         launchl = hardwareMap.get(DcMotor.class, "launchl");
         launchr = hardwareMap.get(DcMotor.class, "launchr");
-        door = hardwareMap.get(Servo.class, "door");
+       // door = hardwareMap.get(Servo.class, "door");
         pivot = hardwareMap.get(Servo.class, "pivot");
+        kick = hardwareMap.get(Servo.class, "kick");
+        wheel = hardwareMap.get(Servo.class, "wheel");
+
+
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
@@ -90,14 +95,29 @@ public class ThirtyHourTeleOp extends LinearOpMode
 
         while (opModeIsActive())
         {
+
+            if(gamepad2.b){
+                wheel.setPosition(0);
+            }
+            if(gamepad2.x){
+                wheel.setPosition(0.3);
+            }
+            if(gamepad2.y){
+                wheel.setPosition(0.6);
+            }
+            if(gamepad1.left_bumper){
+                kick.setPosition(0.4);
+            }else{
+                kick.setPosition(0);
+            }
             launchr.setPower(1);
             launchl.setPower(-1);
             if(gamepad2.right_bumper){
                 intake.setPower(1);
             }else{intake.setPower(0);};
-            if(gamepad2.a){
+       /*     if(gamepad2.a){
                 door.setPosition(0.4);
-            }else{door.setPosition(0.65);}
+            }else{door.setPosition(0.65);} */
             targetFound = false;
             desiredTag  = null;
             if(gamepad2.x){
@@ -106,7 +126,7 @@ public class ThirtyHourTeleOp extends LinearOpMode
                 pivot.setPosition(0.2);
             }
 
-
+            /*
             // Step through the list of detected tags and look for a matching tag
             List<AprilTagDetection> currentDetections = aprilTag.getDetections();
             for (AprilTagDetection detection : currentDetections) {
@@ -138,7 +158,7 @@ public class ThirtyHourTeleOp extends LinearOpMode
             } else {
                 telemetry.addData("\n>","Drive using joysticks to find valid target\n");
             }
-
+            */
             // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
             if (gamepad1.left_bumper && targetFound) {
 
