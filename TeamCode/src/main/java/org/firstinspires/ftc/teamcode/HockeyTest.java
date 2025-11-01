@@ -23,6 +23,7 @@ public class HockeyTest extends LinearOpMode {
     private Servo wheel = null;
 
 
+
     @Override
     public void runOpMode() {
         out = hardwareMap.get(DcMotor.class, "launchr");
@@ -47,21 +48,21 @@ public class HockeyTest extends LinearOpMode {
                 wheel.setPosition(0);
             }
             if(gamepad2.y){
-                wheel.setPosition(0.182);
+                wheel.setPosition(0.7272);
             }
             if(gamepad2.b){
-                wheel.setPosition(0.364);
+                wheel.setPosition(0.384);
             }
             if(gamepad2.x && gamepad2.right_bumper){
-                wheel.setPosition(0.545);
-                sleep(250   );
+                wheel.setPosition(0.565);
+                sleep(250);
             }
             if(gamepad2.y && gamepad2.right_bumper){
-                wheel.setPosition(0.7272);
+                wheel.setPosition(0.212);
                 sleep(250);
             }
             if(gamepad2.b && gamepad2.right_bumper){
-                wheel.setPosition(0.909);
+                wheel.setPosition(0.929);
                 sleep(250);
             }
             if(gamepad1.left_bumper){
