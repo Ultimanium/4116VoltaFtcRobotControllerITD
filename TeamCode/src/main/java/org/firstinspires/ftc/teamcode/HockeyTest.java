@@ -47,10 +47,22 @@ public class HockeyTest extends LinearOpMode {
                 wheel.setPosition(0);
             }
             if(gamepad2.y){
-                wheel.setPosition(0.5);
+                wheel.setPosition(0.182);
             }
             if(gamepad2.b){
-                wheel.setPosition(1);
+                wheel.setPosition(0.364);
+            }
+            if(gamepad2.x && gamepad2.right_bumper){
+                wheel.setPosition(0.545);
+                sleep(250   );
+            }
+            if(gamepad2.y && gamepad2.right_bumper){
+                wheel.setPosition(0.7272);
+                sleep(250);
+            }
+            if(gamepad2.b && gamepad2.right_bumper){
+                wheel.setPosition(0.909);
+                sleep(250);
             }
             if(gamepad1.left_bumper){
                 kick.setPosition(0.4);
