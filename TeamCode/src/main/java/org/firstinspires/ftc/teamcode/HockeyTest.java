@@ -21,11 +21,23 @@ public class HockeyTest extends LinearOpMode {
     private DcMotor intake = null;
     private Servo kick = null;
     private Servo wheel = null;
+    private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
+    private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
+    private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
+    private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
+    private Servo linear = null;
+    double  drive           = 0;        // Desired forward power/speed (-1 to +1)
+    double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
+    double  turn            = 0;// Desired turning power/speed (-1 to +1)
 
 
 
     @Override
     public void runOpMode() {
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
         out = hardwareMap.get(DcMotor.class, "launchr");
         out1 = hardwareMap.get(DcMotor.class, "launchl");
        // flap = hardwareMap.get(Servo.class, "door");
@@ -33,43 +45,53 @@ public class HockeyTest extends LinearOpMode {
         intake = hardwareMap.get(DcMotor.class, "intake");
         kick = hardwareMap.get(Servo.class, "kick");
         wheel = hardwareMap.get(Servo.class, "wheel");
+        linear = hardwareMap.get(Servo.class, "linear");
+
+
 
 
         waitForStart();
         while (opModeIsActive()) {
+            drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
+            strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
+            turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
+            telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+            linear.setPosition(power);
             intake.setPower(gamepad2.left_stick_y);
-            out.setPower(power);
-            out1.setPower(-power);
+            out.setPower(-0.5);
+            out1.setPower(0.5);
 
             telemetry.addData("Power", power);
             telemetry.addData("Pivot", pivot);
             telemetry.update();
-            if(gamepad2.x){
-                wheel.setPosition(0);
-            }
-            if(gamepad2.y){
-                wheel.setPosition(0.7272);
-            }
-            if(gamepad2.b){
-                wheel.setPosition(0.384);
-            }
-            if(gamepad2.x && gamepad2.right_bumper){
-                wheel.setPosition(0.565);
-                sleep(250);
-            }
-            if(gamepad2.y && gamepad2.right_bumper){
-                wheel.setPosition(0.212);
-                sleep(250);
-            }
-            if(gamepad2.b && gamepad2.right_bumper){
-                wheel.setPosition(0.929);
-                sleep(250);
-            }
-            if(gamepad1.left_bumper){
-                kick.setPosition(0.4);
+            if(gamepad2.left_bumper){
+                kick.setPosition(0.6);
             }else{
                 kick.setPosition(0.15);
+                if(gamepad2.x){
+                    wheel.setPosition(0);
+                }
+                if(gamepad2.y){
+                    wheel.setPosition(0.7272);
+                }
+                if(gamepad2.b){
+                    wheel.setPosition(0.384);
+                }
+                if(gamepad2.x && gamepad2.right_bumper){
+                    wheel.setPosition(0.565);
+                    sleep(250);
+                }
+                if(gamepad2.y && gamepad2.right_bumper){
+                    wheel.setPosition(0.212);
+                    sleep(250);
+                }
+                if(gamepad2.b && gamepad2.right_bumper){
+                    wheel.setPosition(0.929);
+                    sleep(250);
+                }
             }
+
+
 
      /*       if(gamepad2.a){
                 flap.setPosition(0.4);
@@ -109,8 +131,36 @@ public class HockeyTest extends LinearOpMode {
                 toggle1 = true;
             }
 
+            telemetry.update();
+
             pivot.setPosition(power1);
+            moveRobot(drive, strafe, turn);
         }
     }
 
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower    =  x -y -yaw;
+        double rightFrontPower   =  x +y +yaw;
+        double leftBackPower     =  x +y -yaw;
+        double rightBackPower    =  x -y +yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        // Send powers to the wheels.
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+    }
 }
