@@ -46,6 +46,10 @@ public class HockeyTest extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "kick");
         wheel = hardwareMap.get(Servo.class, "wheel");
         linear = hardwareMap.get(Servo.class, "linear");
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
 //
 
