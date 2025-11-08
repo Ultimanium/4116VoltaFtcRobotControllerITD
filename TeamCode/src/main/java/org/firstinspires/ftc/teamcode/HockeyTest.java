@@ -30,7 +30,7 @@ public class HockeyTest extends LinearOpMode {
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
     double  turn            = 0;// Desired turning power/speed (-1 to +1)
     double  ws = 0;
-    double test = 1;
+    double test = 0;
 
 
 
@@ -64,15 +64,15 @@ public class HockeyTest extends LinearOpMode {
 
             telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             if(test > 0.5){
-                intake.setPower(1);
+                intake.setPower(0);
             }
             if(test < 0.5){
-                intake.setPower(gamepad2.left_stick_y);
+                intake.setPower(gamepad2.right_stick_y);
 
             }
-            intake.setPower(gamepad2.left_stick_y);
-            out.setPower(-0.65*gamepad2.right_stick_y - ws);
-            out1.setPower(0.65*gamepad2.right_stick_y + ws);
+
+            out.setPower(-0.65*gamepad2.left_stick_y - ws);
+            out1.setPower(0.65*gamepad2.left_stick_y + ws);
             if(gamepad1.a){
                 ws=0.15;
             }else if (gamepad1.b){
@@ -82,7 +82,12 @@ public class HockeyTest extends LinearOpMode {
             telemetry.addData("Pivot", pivot);
             telemetry.update();
             if(gamepad2.left_bumper){
-                kick.setPosition(0.6);
+                if(test<0.5){
+                    kick.setPosition(0.15);
+                }
+                if(test>0.5){
+                    kick.setPosition(0.6);
+                }
             }else{
                 kick.setPosition(0.15);
                 if(gamepad2.x){
