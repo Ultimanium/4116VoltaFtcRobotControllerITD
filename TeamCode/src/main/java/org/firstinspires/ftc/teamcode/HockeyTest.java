@@ -29,6 +29,8 @@ public class HockeyTest extends LinearOpMode {
     double  drive           = 0;        // Desired forward power/speed (-1 to +1)
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
     double  turn            = 0;// Desired turning power/speed (-1 to +1)
+    double  ws = 0;
+    double test = 1;
 
 
 
@@ -46,10 +48,10 @@ public class HockeyTest extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "kick");
         wheel = hardwareMap.get(Servo.class, "wheel");
         linear = hardwareMap.get(Servo.class, "linear");
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
 //
 
@@ -58,13 +60,24 @@ public class HockeyTest extends LinearOpMode {
         while (opModeIsActive()) {
             drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
             strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
-            turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
-            telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-            linear.setPosition(power);
-            intake.setPower(gamepad2.left_stick_y);
-            out.setPower(-0.5);
-            out1.setPower(0.5);
+            turn   = gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
 
+            telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+            if(test > 0.5){
+                intake.setPower(1);
+            }
+            if(test < 0.5){
+                intake.setPower(gamepad2.left_stick_y);
+
+            }
+            intake.setPower(gamepad2.left_stick_y);
+            out.setPower(-0.65*gamepad2.right_stick_y - ws);
+            out1.setPower(0.65*gamepad2.right_stick_y + ws);
+            if(gamepad1.a){
+                ws=0.15;
+            }else if (gamepad1.b){
+                ws = 0;
+            }
             telemetry.addData("Power", power);
             telemetry.addData("Pivot", pivot);
             telemetry.update();
@@ -74,23 +87,29 @@ public class HockeyTest extends LinearOpMode {
                 kick.setPosition(0.15);
                 if(gamepad2.x){
                     wheel.setPosition(0);
+                    test = 0;
                 }
-                if(gamepad2.y){
+                    if(gamepad2.y){
                     wheel.setPosition(0.7272);
+                    test = 0;
                 }
-                if(gamepad2.b){
+                    if(gamepad2.b){
                     wheel.setPosition(0.384);
+                    test = 0;
                 }
-                if(gamepad2.x && gamepad2.right_bumper){
+                    if(gamepad2.x && gamepad2.right_bumper){
                     wheel.setPosition(0.565);
+                    test = 1;
                     sleep(250);
                 }
-                if(gamepad2.y && gamepad2.right_bumper){
+                    if(gamepad2.y && gamepad2.right_bumper){
                     wheel.setPosition(0.212);
+                    test = 1;
                     sleep(250);
                 }
-                if(gamepad2.b && gamepad2.right_bumper){
+                    if(gamepad2.b && gamepad2.right_bumper){
                     wheel.setPosition(0.929);
+                    test = 1;
                     sleep(250);
                 }
             }
@@ -139,6 +158,10 @@ public class HockeyTest extends LinearOpMode {
 
             pivot.setPosition(power1);
             moveRobot(drive, strafe, turn);
+            linear.setPosition(power);
+            telemetry.addData("LINEAR", linear.getPosition());
+            telemetry.addData("test", test);
+
         }
     }
 
