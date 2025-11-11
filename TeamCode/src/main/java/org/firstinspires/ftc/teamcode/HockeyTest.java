@@ -13,7 +13,6 @@ public class HockeyTest extends LinearOpMode {
     private DcMotor out = null;
     private DcMotor out1 = null;
    // public Servo flap = null;
-    public Servo pivot = null;
     public float power = 0;
     public boolean toggle = true;
     public float power1 = 0;
@@ -43,7 +42,6 @@ public class HockeyTest extends LinearOpMode {
         out = hardwareMap.get(DcMotor.class, "launchr");
         out1 = hardwareMap.get(DcMotor.class, "launchl");
        // flap = hardwareMap.get(Servo.class, "door");
-        pivot = hardwareMap.get(Servo.class, "pivot");
         intake = hardwareMap.get(DcMotor.class, "intake");
         kick = hardwareMap.get(Servo.class, "kick");
         wheel = hardwareMap.get(Servo.class, "wheel");
@@ -79,7 +77,6 @@ public class HockeyTest extends LinearOpMode {
                 ws = 0;
             }
             telemetry.addData("Power", power);
-            telemetry.addData("Pivot", pivot);
             telemetry.update();
             if(gamepad2.left_bumper){
                 if(test<0.5){
@@ -161,7 +158,6 @@ public class HockeyTest extends LinearOpMode {
 
             telemetry.update();
 
-            pivot.setPosition(power1);
             moveRobot(drive, strafe, turn);
             linear.setPosition(power);
             telemetry.addData("LINEAR", linear.getPosition());
