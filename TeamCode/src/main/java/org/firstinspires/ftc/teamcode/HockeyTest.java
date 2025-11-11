@@ -56,9 +56,9 @@ public class HockeyTest extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
-            strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
-            turn   = gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
+            drive  = -gamepad1.left_stick_y ;  // Reduce drive rate to 50%.
+            strafe = -gamepad1.left_stick_x ;  // Reduce strafe rate to 50%.
+            turn   = gamepad1.right_stick_x;  // Reduce turn rate to 33%.
 
             telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             if(test > 0.5){
@@ -69,8 +69,8 @@ public class HockeyTest extends LinearOpMode {
 
             }
 
-            out.setPower(-0.65*gamepad2.left_stick_y - ws);
-            out1.setPower(0.65*gamepad2.left_stick_y + ws);
+            out.setPower(-0.75*gamepad2.left_stick_y - ws);
+            out1.setPower(0.75*gamepad2.left_stick_y + ws);
             if(gamepad1.a){
                 ws=0.15;
             }else if (gamepad1.b){
@@ -105,12 +105,12 @@ public class HockeyTest extends LinearOpMode {
                     sleep(250);
                 }
                     if(gamepad2.y && gamepad2.right_bumper){
-                    wheel.setPosition(0.212);
+                    wheel.setPosition(0.192);
                     test = 1;
                     sleep(250);
                 }
                     if(gamepad2.b && gamepad2.right_bumper){
-                    wheel.setPosition(0.929);
+                    wheel.setPosition(0.909);
                     test = 1;
                     sleep(250);
                 }
