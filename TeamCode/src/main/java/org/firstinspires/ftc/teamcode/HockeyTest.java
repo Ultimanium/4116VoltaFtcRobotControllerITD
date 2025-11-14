@@ -118,11 +118,6 @@ public class HockeyTest extends LinearOpMode {
 
 
 
-     /*       if(gamepad2.a){
-                flap.setPosition(0.4);
-            } else{
-                flap.setPosition(0.65);
-            }   */
 
             if(gamepad2.dpad_down && toggle){
                 toggle = false;
