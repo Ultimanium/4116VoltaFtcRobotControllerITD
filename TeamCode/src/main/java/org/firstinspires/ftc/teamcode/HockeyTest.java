@@ -28,7 +28,8 @@ public class HockeyTest extends LinearOpMode {
 
     final double SPEED_GAIN  =  0.02  ;
     final double STRAFE_GAIN =  0.015 ;
-    final double TURN_GAIN   =  0.01  ;
+    final double TURN_GAIN   =  0.5  ;
+    final double EXPONENTIAL_TURN_RANGE = 20;
 
     final double MAX_AUTO_SPEED = 0.5;
     final double MAX_AUTO_STRAFE= 0.5;
@@ -88,10 +89,10 @@ public class HockeyTest extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "kick");
         wheel = hardwareMap.get(Servo.class, "wheel");
         linear = hardwareMap.get(Servo.class, "linear");
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         //ashbaby
         if (USE_WEBCAM)
@@ -140,23 +141,32 @@ public class HockeyTest extends LinearOpMode {
 
                 double headingError = 0;
 
-                if(desiredTag.ftcPose.x == 6){
-                    headingError = 90 + Math.atan(desiredTag.ftcPose.y / (desiredTag.ftcPose.x - 6));
+                if(desiredTag.ftcPose.x != 6){
+                    headingError = ((180 / Math.PI) * Math.atan(desiredTag.ftcPose.y / (desiredTag.ftcPose.x + 6)));
                 }
+
+
+                if(headingError < 0){
+                    headingError = -(-90 - headingError);
+                } else if(headingError > 0) {
+                    headingError = -(90 - headingError);
+                }
+
+
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
                 drive  = -gamepad1.left_stick_y;
-                turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                strafe = gamepad1.right_stick_x;
+                turn   = Range.clip(Math.pow(headingError / EXPONENTIAL_TURN_RANGE, 3) * EXPONENTIAL_TURN_RANGE * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                strafe = -gamepad1.left_stick_x;
 
-                telemetry.addData("Auto","April tag distance", drive);
-                telemetry.addData("Auto","ChangingAngle", headingError);
+                telemetry.addData("April tag distance", desiredTag.ftcPose.y);
+                telemetry.addData("changing angle",headingError);
             } else {
 
                 // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
                 drive  = -gamepad1.left_stick_y;
                 strafe = -gamepad1.left_stick_x;
-                turn   = gamepad1.right_stick_x;
+                turn   = -gamepad1.right_stick_x;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
 
@@ -176,7 +186,6 @@ public class HockeyTest extends LinearOpMode {
                 ws = 0;
             }
             telemetry.addData("Power", power);
-            telemetry.update();
             if(gamepad2.left_bumper){
                 if(test<0.5){
                     kick.setPosition(0.15);
