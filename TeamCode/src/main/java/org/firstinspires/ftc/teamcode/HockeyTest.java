@@ -163,15 +163,15 @@ public class HockeyTest extends LinearOpMode {
             if(test > 0.5){
                 intake.setPower(0);
             }
+
             if(test < 0.5){
                 intake.setPower(gamepad2.right_stick_y);
-
             }
 
-            out.setPower(-0.75*gamepad2.left_stick_y - ws);
-            out1.setPower(0.75*gamepad2.left_stick_y + ws);
+            out.setPower(-0.68*gamepad2.left_stick_y - ws);
+            out1.setPower(0.68*gamepad2.left_stick_y + ws);
             if(gamepad1.a){
-                ws=0.15;
+                ws=-0.15;
             }else if (gamepad1.b){
                 ws = 0;
             }
@@ -180,6 +180,7 @@ public class HockeyTest extends LinearOpMode {
             if(gamepad2.left_bumper){
                 if(test<0.5){
                     kick.setPosition(0.15);
+                    sleep(250);
                 }
                 if(test>0.5){
                     kick.setPosition(0.6);
