@@ -46,10 +46,10 @@ public class HockeyTest extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "kick");
         wheel = hardwareMap.get(Servo.class, "wheel");
         linear = hardwareMap.get(Servo.class, "linear");
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
 //
 
@@ -58,7 +58,7 @@ public class HockeyTest extends LinearOpMode {
         while (opModeIsActive()) {
             drive  = -gamepad1.left_stick_y ;  // Reduce drive rate to 50%.
             strafe = -gamepad1.left_stick_x ;  // Reduce strafe rate to 50%.
-            turn   = gamepad1.right_stick_x;  // Reduce turn rate to 33%.
+            turn   = gamepad1.right_stick_x/-2;  // Reduce turn rate to 33%.
 
             telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             if(test > 0.5){
