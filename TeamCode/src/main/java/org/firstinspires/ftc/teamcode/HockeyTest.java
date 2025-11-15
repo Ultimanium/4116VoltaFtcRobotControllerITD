@@ -247,13 +247,14 @@ public class HockeyTest extends LinearOpMode {
                 toggle1 = true;
             }
 
-            telemetry.update();
+
 
             moveRobot(drive, strafe, turn);
             linear.setPosition(power);
             telemetry.addData("LINEAR", linear.getPosition());
             telemetry.addData("test", test);
-
+            telemetry.update();
+            sleep(10);
         }
     }
 
