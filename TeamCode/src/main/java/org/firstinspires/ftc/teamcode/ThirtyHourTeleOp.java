@@ -20,39 +20,37 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name="ThirtyHourTeleOp", group = "ThirtyHour")
 public class ThirtyHourTeleOp extends LinearOpMode
 {
+
     // Adjust these numbers to suit your robot.
-    final double DESIRED_DISTANCE = 0.0; //  this is how close the camera should get to the target (inches)
-    final double DESIRED_ANGLE = 5.0;
+    final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
     //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
     final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". e.g. Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  e.g. Ramp up to 37% power at a 25 degree Yaw error.   (0.375 / 25.0)
-    final double TURN_GAIN   =  0.035  ;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+    final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
-    final float SHOTMULT = 2f;
     final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_STRAFE= 0.5;   //  Clip the strafing speed to this max value (adjust for your robot)
-    final double MAX_AUTO_TURN  = 0.6;   //  Clip the turn speed to this max value (adjust for your robot)
-    float LateralDistanceToPost = 0.0f;
+    final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
 
     private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
     private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
-    private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
-    private DcMotor right = null;
-    private DcMotor left = null;
-    private Servo d = null;
-
+    private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
+    private DcMotor launchl = null;
+    private DcMotor launchr = null;
+   // private Servo door = null;
+    private DcMotor intake = null;
+    private Servo pivot = null;
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
-    private static final int DESIRED_TAG_ID = 20;     // Choose the tag you want to approach or set to -1 for ANY tag.
+    private static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
-    private AprilTagDetection desiredTag = null;
-
-    private DcMotor intake = null;// Used to hold the data for a detected AprilTag
-
+    private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
+    private Servo kick = null;
+    private Servo wheel = null;
     @Override public void runOpMode()
     {
         boolean targetFound     = false;    // Set to true when an AprilTag target is detected
@@ -61,7 +59,7 @@ public class ThirtyHourTeleOp extends LinearOpMode
         double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
-        initAprilTag();
+        /* initAprilTag(); */
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must match the names assigned during the robot configuration.
@@ -70,10 +68,13 @@ public class ThirtyHourTeleOp extends LinearOpMode
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
-        intake = hardwareMap.get(DcMotor.class, "intake");
-        left = hardwareMap.get(DcMotor.class, "left");
-        right = hardwareMap.get(DcMotor.class, "right");
-        d = hardwareMap.get(Servo.class, "d");
+        launchl = hardwareMap.get(DcMotor.class, "launchl");
+        launchr = hardwareMap.get(DcMotor.class, "launchr");
+       // door = hardwareMap.get(Servo.class, "door");
+        pivot = hardwareMap.get(Servo.class, "pivot");
+        kick = hardwareMap.get(Servo.class, "kick");
+        wheel = hardwareMap.get(Servo.class, "wheel");
+
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -94,20 +95,58 @@ public class ThirtyHourTeleOp extends LinearOpMode
 
         while (opModeIsActive())
         {
-            if(gamepad2.left_bumper){
-                intake.setPower(0.7);
-            }else{intake.setPower(0.05);}
 
+            if(gamepad2.x){
+                wheel.setPosition(0);
+            }
+            if(gamepad2.y){
+                wheel.setPosition(0.7272);
+            }
+            if(gamepad2.b){
+                wheel.setPosition(0.384);
+            }
+            if(gamepad2.x && gamepad2.right_bumper){
+                wheel.setPosition(0.565);
+                sleep(250);
+            }
+            if(gamepad2.y && gamepad2.right_bumper){
+                wheel.setPosition(0.212);
+                sleep(250);
+            }
+            if(gamepad2.b && gamepad2.right_bumper){
+                wheel.setPosition(0.929);
+                sleep(250);
+            }
+            if(gamepad1.left_bumper){
+                kick.setPosition(0.6);
+            }else{
+                kick.setPosition(0.15);
+            }
+
+            launchr.setPower(1);
+            launchl.setPower(-1);
+            if(gamepad2.right_bumper){
+                intake.setPower(1);
+            }else{intake.setPower(0);};
+       /*     if(gamepad2.a){
+                door.setPosition(0.4);
+            }else{door.setPosition(0.65);} */
             targetFound = false;
             desiredTag  = null;
+            if(gamepad2.x){
+              pivot.setPosition(0);
+            } else if (gamepad2.y) {
+                pivot.setPosition(0.2);
+            }
 
+            /*
             // Step through the list of detected tags and look for a matching tag
             List<AprilTagDetection> currentDetections = aprilTag.getDetections();
             for (AprilTagDetection detection : currentDetections) {
                 // Look to see if we have size info on this tag.
                 if (detection.metadata != null) {
                     //  Check to see if we want to track towards this tag.
-                    if ((detection.id == 20) || (detection.id == 24)) {
+                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
                         // Yes, we want to use this tag.
                         targetFound = true;
                         desiredTag = detection;
@@ -132,21 +171,19 @@ public class ThirtyHourTeleOp extends LinearOpMode
             } else {
                 telemetry.addData("\n>","Drive using joysticks to find valid target\n");
             }
-
+            */
             // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
             if (gamepad1.left_bumper && targetFound) {
 
                 // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
                 double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-                double  headingError    = (desiredTag.ftcPose.bearing - DESIRED_ANGLE);
+                double  headingError    = desiredTag.ftcPose.bearing;
                 double  yawError        = desiredTag.ftcPose.yaw;
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
-                //drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                drive  = -gamepad1.left_stick_y  / 2.0;
+                drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
                 turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
-                strafe = -gamepad1.left_stick_x  / 2.0;
-                //strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
                 telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             } else {
@@ -157,34 +194,10 @@ public class ThirtyHourTeleOp extends LinearOpMode
                 turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
+            telemetry.update();
 
             // Apply desired axes motions to the drivetrain.
             moveRobot(drive, strafe, turn);
-
-            if(desiredTag != null){
-                LateralDistanceToPost = (float)Math.sqrt(Math.pow(desiredTag.ftcPose.range, 2) - 870.25); //pythag theorem or whatever, changes distance (C) and height (B and 29.5 (sqrt of 870.25)) to lateral distance (A)
-            }
-
-            telemetry.addData("Lateral Distance", LateralDistanceToPost);
-
-            telemetry.addData("d", d.getPosition());
-
-
-            telemetry.update();
-
-            float shotPower = (float) LateralDistanceToPost / 125f /* <-- ENTER PERFECT DISTANCE FOR 1 POWER IN INCHES. FROM CAMERA TO BASE OF GOAL*/ ;
-            //shotPower = 0.7f; /* <-- uncomment line to test 0.7 power */
-
-            shotPower = (float) (Math.pow(shotPower, SHOTMULT) - (1 - SHOTMULT)) / SHOTMULT;
-
-            if(gamepad2.right_bumper){
-                left.setPower(- 0.55);
-                right.setPower(0.55);
-            } else {
-                left.setPower(0);
-                right.setPower(0);
-            }
-            d.setPosition((gamepad2.left_stick_y/1.7)+0.2);
             sleep(10);
         }
     }
