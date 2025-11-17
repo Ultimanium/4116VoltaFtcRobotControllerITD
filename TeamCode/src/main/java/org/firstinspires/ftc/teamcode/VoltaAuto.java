@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@TeleOp(name="Voltacular", group="Linear OpMode")
+@Autonomous(name="Voltacular", group="Autonomous", preselectTeleOp = "VoltacularOp")
 
 public class VoltaAuto extends LinearOpMode {
 
@@ -131,137 +132,9 @@ public class VoltaAuto extends LinearOpMode {
                 telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
                 telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
                 telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
-            } else {
-                telemetry.addData("\n>","Drive using joysticks to find valid target\n");
             }
-
             // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-            if (gamepad1.left_bumper && targetFound) {
-
-                double headingError = 0;
-
-                if(desiredTag.ftcPose.x != 6){
-                    headingError = ((180 / Math.PI) * Math.atan(desiredTag.ftcPose.y / (desiredTag.ftcPose.x + 6)));
-                }
-
-
-                if(headingError < 0){
-                    headingError = -(-90 - headingError);
-                } else if(headingError > 0) {
-                    headingError = -(90 - headingError);
-                }
-
-
-
-                // Use the speed and turn "gains" to calculate how we want the robot to move.
-                drive  = -gamepad1.left_stick_y;
-                turn   = Range.clip(Math.pow(headingError / EXPONENTIAL_TURN_RANGE, 3) * EXPONENTIAL_TURN_RANGE * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                strafe = -gamepad1.left_stick_x;
-
-                telemetry.addData("April tag distance", desiredTag.ftcPose.y);
-                telemetry.addData("changing angle",headingError);
-            } else {
-
-                // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                drive  = -gamepad1.left_stick_y;
-                strafe = -gamepad1.left_stick_x;
-                turn   = -gamepad1.right_stick_x;
-                telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-            }
-
-            if(test > 0.5){
-                intake.setPower(0);
-            }
-
-            if(test < 0.5){
-                intake.setPower(gamepad2.right_stick_y);
-            }
-
-            out.setPower(-0.68*gamepad2.left_stick_y - ws);
-            out1.setPower(0.68*gamepad2.left_stick_y + ws);
-            if(gamepad1.a){
-                ws=-0.15;
-            }else if (gamepad1.b){
-                ws = 0;
-            }
-            telemetry.addData("Power", power);
-            if(gamepad2.left_bumper){
-                if(test<0.5){
-                    kick.setPosition(0.15);
-                    sleep(250);
-                }
-                if(test>0.5){
-                    kick.setPosition(0.6);
-                }
-            }else{
-                kick.setPosition(0.15);
-                if(gamepad2.x){
-                    wheel.setPosition(0);
-                    test = 0;
-                }
-                    if(gamepad2.y){
-                    wheel.setPosition(0.7272);
-                    test = 0;
-                }
-                    if(gamepad2.b){
-                    wheel.setPosition(0.384);
-                    test = 0;
-                }
-                    if(gamepad2.x && gamepad2.right_bumper){
-                    wheel.setPosition(0.565);
-                    test = 1;
-                    sleep(250);
-                }
-                    if(gamepad2.y && gamepad2.right_bumper){
-                    wheel.setPosition(0.192);
-                    test = 1;
-                    sleep(250);
-                }
-                    if(gamepad2.b && gamepad2.right_bumper){
-                    wheel.setPosition(0.909);
-                    test = 1;
-                    sleep(250);
-                }
-            }
-
-            if(gamepad2.dpad_down && toggle){
-                toggle = false;
-                power -= 0.05f;
-                if(power < -1){
-                    power = -1;
-                }
-            } else if(gamepad2.dpad_up && toggle){
-                toggle = false;
-                power += 0.05f;
-                if(power > 1){
-                    power = 1;
-                }
-            } else if ((!toggle) && (!gamepad2.dpad_up) && (!gamepad2.dpad_down)){
-                toggle = true;
-            }
-
-            if(gamepad2.dpad_left && toggle1){
-                toggle1 = false;
-                power1 -= 0.05f;
-                if(power1 < 0){
-                    power1 = 0;
-                }
-            } else if(gamepad2.dpad_right && toggle1){
-                toggle1 = false;
-                power1 += 0.05f;
-                if(power1 > 1){
-                    power1 = 1;
-                }
-            } else if ((!toggle1) && (!gamepad2.dpad_left) && (!gamepad2.dpad_right)){
-                toggle1 = true;
-            }
-
-
-
             moveRobot(drive, strafe, turn);
-            linear.setPosition(power);
-            telemetry.addData("LINEAR", linear.getPosition());
-            telemetry.addData("test", test);
             telemetry.update();
             sleep(10);
         }
@@ -291,6 +164,39 @@ public class VoltaAuto extends LinearOpMode {
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
+    }
+
+    public void moveRobot(double x, double y, double yaw, long milleseconds) {
+        // Calculate wheel powers.
+        double leftFrontPower    =  x -y -yaw;
+        double rightFrontPower   =  x +y +yaw;
+        double leftBackPower     =  x +y -yaw;
+        double rightBackPower    =  x -y +yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        // Send powers to the wheels.
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+
+        sleep(milleseconds);
+
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
     }
 
     //let there be a part two; electric boogaloo

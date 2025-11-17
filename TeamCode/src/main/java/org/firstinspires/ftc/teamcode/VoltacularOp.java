@@ -17,7 +17,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@TeleOp(name="Voltacular", group="Linear OpMode")
+@TeleOp(name="VoltacularOp", group="Linear OpMode")
 
 public class VoltacularOp extends LinearOpMode {
 
