@@ -28,8 +28,8 @@ public class HockeyTest extends LinearOpMode {
 
     final double SPEED_GAIN  =  0.02  ;
     final double STRAFE_GAIN =  0.015 ;
-    final double TURN_GAIN   =  0.5  ;
-    final double EXPONENTIAL_TURN_RANGE = 20;
+    final double TURN_GAIN   =  1  ;
+    final double EXPONENTIAL_TURN_RANGE = 25;
 
     final double MAX_AUTO_SPEED = 0.5;
     final double MAX_AUTO_STRAFE= 0.5;
@@ -156,7 +156,7 @@ public class HockeyTest extends LinearOpMode {
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
                 drive  = -gamepad1.left_stick_y;
-                turn   = Range.clip(Math.pow(headingError / EXPONENTIAL_TURN_RANGE, 1) * EXPONENTIAL_TURN_RANGE * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                turn   = Range.clip(Math.pow(headingError / EXPONENTIAL_TURN_RANGE, 3) * EXPONENTIAL_TURN_RANGE * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
                 strafe = -gamepad1.left_stick_x;
 
                 telemetry.addData("April tag distance", desiredTag.ftcPose.y);
