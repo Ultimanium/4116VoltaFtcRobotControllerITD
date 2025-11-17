@@ -78,17 +78,17 @@ public class HockeyTest extends LinearOpMode {
         // Let there be light.
         initAprilTag();
 
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
-        out = hardwareMap.get(DcMotor.class, "launchr");
-        out1 = hardwareMap.get(DcMotor.class, "launchl");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
+        out = hardwareMap.get(DcMotor.class, "lr");
+        out1 = hardwareMap.get(DcMotor.class, "ll");
        // flap = hardwareMap.get(Servo.class, "door");
-        intake = hardwareMap.get(DcMotor.class, "intake");
-        kick = hardwareMap.get(Servo.class, "kick");
-        wheel = hardwareMap.get(Servo.class, "wheel");
-        linear = hardwareMap.get(Servo.class, "linear");
+        intake = hardwareMap.get(DcMotor.class, "i");
+        kick = hardwareMap.get(Servo.class, "k");
+        wheel = hardwareMap.get(Servo.class, "pw");
+        linear = hardwareMap.get(Servo.class, "li");
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -110,7 +110,7 @@ public class HockeyTest extends LinearOpMode {
                 // Is ts real?
                 if (detection.metadata != null) {
                     // Do we want ts?
-                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                    if ((detection.id == 24) || (detection.id == 20)) {
                         // yuh uh
                         targetFound = true;
                         desiredTag = detection;
@@ -156,7 +156,7 @@ public class HockeyTest extends LinearOpMode {
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
                 drive  = -gamepad1.left_stick_y;
-                turn   = Range.clip(Math.pow(headingError / EXPONENTIAL_TURN_RANGE, 3) * EXPONENTIAL_TURN_RANGE * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                turn   = Range.clip(Math.pow(headingError / EXPONENTIAL_TURN_RANGE, 1) * EXPONENTIAL_TURN_RANGE * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
                 strafe = -gamepad1.left_stick_x;
 
                 telemetry.addData("April tag distance", desiredTag.ftcPose.y);
