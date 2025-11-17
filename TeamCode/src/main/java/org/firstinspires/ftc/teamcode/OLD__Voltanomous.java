@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -50,7 +49,7 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
 @Disabled
 @Autonomous(name="Voltanomous", group="Autonomous", preselectTeleOp = "VoltaTeleOp")
 
-public class Voltanomous extends LinearOpMode {
+public class OLD__Voltanomous extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private TouchSensor up, down;

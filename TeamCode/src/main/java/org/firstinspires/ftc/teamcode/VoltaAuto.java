@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 @TeleOp(name="Voltacular", group="Linear OpMode")
 
-public class HockeyTest extends LinearOpMode {
+public class VoltaAuto extends LinearOpMode {
 
     // Nathaniel's play area
 
