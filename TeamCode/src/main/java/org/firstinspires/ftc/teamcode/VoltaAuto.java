@@ -100,6 +100,11 @@ public class VoltaAuto extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            //PENIEL RIGHT HERE
+            moveRobot(0.5,0,0,30);
+            sleep(10000);
+            //HERE ^^^^
+            // moves the robot for one second. Power and time.
             targetFound = false;
             desiredTag  = null;
             //womp, womp.
@@ -160,10 +165,10 @@ public class VoltaAuto extends LinearOpMode {
         }
 
         // Send powers to the wheels.
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightBackDrive.setPower(rightBackPower);
+        leftFrontDrive.setPower(leftFrontPower/2);
+        rightFrontDrive.setPower(rightFrontPower/2);
+        leftBackDrive.setPower(leftBackPower/2);
+        rightBackDrive.setPower(rightBackPower/2);
     }
 
     public void moveRobot(double x, double y, double yaw, long milleseconds) {
