@@ -99,13 +99,10 @@ public class VoltaAuto extends LinearOpMode {
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
 
         waitForStart();
+        moveRobot(1,0,0);
+        sleep(1000);
+        moveRobot(0,0,0);
         while (opModeIsActive()) {
-            //PENIEL RIGHT HERE
-            moveRobot(0.5,0,0);
-            sleep(1000);
-            moveRobot(0,0,0);
-            //HERE ^^^^
-            // moves the robot for one second. Power and time.
             targetFound = false;
             desiredTag  = null;
             //womp, womp.
