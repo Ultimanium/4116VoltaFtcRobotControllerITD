@@ -101,8 +101,9 @@ public class VoltaAuto extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             //PENIEL RIGHT HERE
-            moveRobot(0.5,0,0,30);
-            sleep(10000);
+            moveRobot(0.5,0,0);
+            sleep(1000);
+            moveRobot(0,0,0);
             //HERE ^^^^
             // moves the robot for one second. Power and time.
             targetFound = false;
@@ -139,7 +140,7 @@ public class VoltaAuto extends LinearOpMode {
                 telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
             }
             // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-            moveRobot(drive, strafe, turn);
+            //moveRobot(drive, strafe, turn);
             telemetry.update();
             sleep(10);
         }
