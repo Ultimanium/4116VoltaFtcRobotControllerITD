@@ -177,8 +177,13 @@ public class VoltacularOp extends LinearOpMode {
                 intake.setPower(gamepad2.right_stick_y);
             }
 
-            out.setPower(-0.68*gamepad2.left_stick_y - ws);
-            out1.setPower(0.68*gamepad2.left_stick_y + ws);
+            out.setPower(-0.68 * gamepad2.left_stick_y - ws);
+            out1.setPower(0.68 * gamepad2.left_stick_y + ws);
+
+            if(gamepad1.a){
+
+            }
+
             if(gamepad1.a){
                 ws=-0.15;
             }else if (gamepad1.b){
