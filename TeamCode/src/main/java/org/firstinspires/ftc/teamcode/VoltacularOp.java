@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -20,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name="VoltacularOp", group="Linear OpMode")
 
 public class VoltacularOp extends LinearOpMode {
+
+    private ElapsedTime runtime = new ElapsedTime();
 
     // Nathaniel's play area
 
@@ -197,35 +200,38 @@ public class VoltacularOp extends LinearOpMode {
                 }
                 if(test>0.5){
                     kick.setPosition(0.6);
+                    runtime.reset();
                 }
             }else{
                 kick.setPosition(0.15);
-                if(gamepad2.x){
-                    wheel.setPosition(0);
-                    test = 0;
-                }
-                    if(gamepad2.y){
-                    wheel.setPosition(0.7272);
-                    test = 0;
-                }
-                    if(gamepad2.b){
-                    wheel.setPosition(0.384);
-                    test = 0;
-                }
-                    if(gamepad2.x && gamepad2.right_bumper){
-                    wheel.setPosition(0.565);
-                    test = 1;
-                    sleep(250);
-                }
-                    if(gamepad2.y && gamepad2.right_bumper){
-                    wheel.setPosition(0.192);
-                    test = 1;
-                    sleep(250);
-                }
-                    if(gamepad2.b && gamepad2.right_bumper){
-                    wheel.setPosition(0.909);
-                    test = 1;
-                    sleep(250);
+                if(runtime.seconds() > 0.25) {
+                    if (gamepad2.x) {
+                        wheel.setPosition(0);
+                        test = 0;
+                    }
+                    if (gamepad2.y) {
+                        wheel.setPosition(0.7272);
+                        test = 0;
+                    }
+                    if (gamepad2.b) {
+                        wheel.setPosition(0.384);
+                        test = 0;
+                    }
+                    if (gamepad2.x && gamepad2.right_bumper) {
+                        wheel.setPosition(0.565);
+                        test = 1;
+                        sleep(250);
+                    }
+                    if (gamepad2.y && gamepad2.right_bumper) {
+                        wheel.setPosition(0.192);
+                        test = 1;
+                        sleep(250);
+                    }
+                    if (gamepad2.b && gamepad2.right_bumper) {
+                        wheel.setPosition(0.909);
+                        test = 1;
+                        sleep(250);
+                    }
                 }
             }
 
