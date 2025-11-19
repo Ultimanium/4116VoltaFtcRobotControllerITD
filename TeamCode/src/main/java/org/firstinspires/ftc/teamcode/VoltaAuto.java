@@ -24,10 +24,11 @@ public class VoltaAuto extends LinearOpMode {
 
     // Nathaniel's play area
 
-    final double DESIRED_DISTANCE = 12.0;
+    final double DESIRED_DISTANCE = 48.0;
 
-    final double SPEED_GAIN  =  0.02  ;
-    final double STRAFE_GAIN =  0.015 ;
+    final double SPEED_GAIN  =  1  ;
+    final double STRAFE_GAIN =  1 ;
+    final double EXPONENTIAL_RANGE = 12;
     final double TURN_GAIN   =  1  ;
     final double EXPONENTIAL_TURN_RANGE = 25;
 
@@ -64,7 +65,115 @@ public class VoltaAuto extends LinearOpMode {
     double  ws = 0;
     double test = 0;
 
+    int desiredID = -1;
 
+    int balls = 3;
+    double[] ballArray = {-1,-1,-1};
+    long delay = 0;
+
+    public enum START_POSITION{
+        Left,
+        Right
+    }
+
+    public VoltaAuto.START_POSITION position;
+
+    public void selectStartingPosition() {
+        telemetry.setAutoClear(true);
+        telemetry.clearAll();
+        position = START_POSITION.Right;
+        desiredID = 20;
+        while (!isStopRequested()) {
+            telemetry.addData("Initializing Autonomous Mode for Team ", "4116");
+            telemetry.addData("---------------------------------------", "");
+            telemetry.addData("Set Position using bumpers on gamepad 1:", "");
+            telemetry.addData("Setting Position to  ", position);
+            telemetry.addData("\n press A on gamepad 1 to confirm", "");
+            if (gamepad1.a) {
+                break;
+            }
+            if (gamepad1.left_bumper) {
+                position = START_POSITION.Left;
+                while (gamepad1.left_bumper && !isStopRequested()) {
+                    telemetry.addData("Remove your hand from the left bumper NOW.", "");
+                    telemetry.update();
+                }
+            }
+            if (gamepad1.right_bumper) {
+                position = START_POSITION.Right;
+                while (gamepad1.dpad_down && !isStopRequested()) {
+                    telemetry.addData("Remove your hand from the right bumper NOW.", "");
+                    telemetry.update();
+                }
+            }
+            telemetry.update();
+        }
+        while (gamepad1.a && !isStopRequested()) {
+            telemetry.addData("Remove your hand from the a button NOW.", "");
+            telemetry.update();
+        }
+        while (!isStopRequested()) {
+            telemetry.addData("Initializing Autonomous Mode for Team ", "4116");
+            telemetry.addData("---------------------------------------", "");
+            telemetry.addData("Set Team using buttons on gamepad 1:", "");
+            telemetry.addData("Setting Team to  ", desiredID);
+            telemetry.addData("20 = Blue, 24 = Red", "");
+            telemetry.addData("\n press A on gamepad 1 to confirm", "");
+            if (gamepad1.a) {
+                break;
+            }
+            if (gamepad1.x) {
+                desiredID = 20;
+                while (gamepad1.x && !isStopRequested()) {
+                    telemetry.addData("Remove your hand from the x button NOW.", "");
+                    telemetry.update();
+                }
+            }
+            if (gamepad1.b) {
+                desiredID = 24;
+                while (gamepad1.b && !isStopRequested()) {
+                    telemetry.addData("Remove your hand from the b button NOW.", "");
+                    telemetry.update();
+                }
+            }
+            telemetry.update();
+        }
+    }
+
+    public void selectStartingDelay() {
+        while (gamepad1.a && !isStopRequested()) {
+            telemetry.addData("Remove your hand from the a button NOW.", "");
+            telemetry.update();
+        }
+        telemetry.setAutoClear(true);
+        telemetry.clearAll();
+        delay = 0;
+        while (!isStopRequested()) {
+            telemetry.addData("Initializing Autonomous Mode for Team ", "4116");
+            telemetry.addData("---------------------------------------", "");
+            telemetry.addData("Set Delay using dpad on gamepad 1:", "");
+            telemetry.addData("Setting Delay to  ", delay);
+            telemetry.addData("\n press A on gamepad 1 to confirm", "");
+            if (gamepad1.a) {
+                break;
+            }
+            if (gamepad1.dpad_up) {
+                delay += 500;
+                while (gamepad1.dpad_up && !isStopRequested()) {
+                    telemetry.addData("Remove your hand from the dpad NOW.", "");
+                    telemetry.update();
+                }
+            }
+            if (gamepad1.dpad_down) {
+                delay -= 500;
+                while (gamepad1.dpad_down && !isStopRequested()) {
+                    telemetry.addData("Remove your hand from the dpad NOW.", "");
+                    telemetry.update();
+                }
+            }
+            telemetry.update();
+        }
+    }
 
     @Override
     public void runOpMode() {
@@ -98,9 +207,13 @@ public class VoltaAuto extends LinearOpMode {
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
 
+        selectStartingPosition();
+        selectStartingDelay();
+
         waitForStart();
-        moveRobot(1,0,0);
-        sleep(1000);
+        sleep(delay);
+        moveRobot(0.75,0,0);
+        sleep(1500);
         moveRobot(0,0,0);
         while (opModeIsActive()) {
             targetFound = false;
@@ -113,11 +226,20 @@ public class VoltaAuto extends LinearOpMode {
                 // Is ts real?
                 if (detection.metadata != null) {
                     // Do we want ts?
-                    if ((detection.id == 24) || (detection.id == 20)) {
+                    if ((detection.id == desiredID) && ballArray[0] != -1) {
                         // yuh uh
                         targetFound = true;
                         desiredTag = detection;
                         break;  // stop your gaze.
+                    } else if (detection.id == 21){
+                        // GPP
+                        ballArray = new double[]{0.565, 0.192, 0.909};
+                    } else if (detection.id == 22){
+                        // PGP
+                        ballArray = new double[]{0.192, 0.565, 0.909};
+                    } else if (detection.id == 23){
+                        // PPG
+                        ballArray = new double[]{0.192, 0.909, 0.565};
                     } else {
                         // nuh uh
                         telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
@@ -128,18 +250,78 @@ public class VoltaAuto extends LinearOpMode {
                 }
             }
 
-            // Yell at driver
             if (targetFound) {
-                telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
-                telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-                telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-                telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
-                telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+
+                double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+                double  headingError    = 0;
+                double  yawError        = desiredTag.ftcPose.yaw;
+
+                if(desiredTag.ftcPose.x != 6){
+                    headingError = ((180 / Math.PI) * Math.atan(desiredTag.ftcPose.y / (desiredTag.ftcPose.x + 6)));
+                }
+
+
+                if(headingError < 0){
+                    headingError = -(-90 - headingError);
+                } else if(headingError > 0) {
+                    headingError = -(90 - headingError);
+                }
+
+
+                if((Math.abs(headingError) < 5 && Math.abs(rangeError) < 3  && Math.abs(yawError) < 3) && balls > 0){
+                    telemetry.addData("LAUNCHING BALL NUM",3 - balls);
+                    telemetry.update();
+                    kick.setPosition(0.15);
+                    out.setPower(0.68);
+                    out1.setPower(-0.68);
+                    moveRobot(0, 0, 0);
+                    wheel.setPosition(ballArray[3 - balls]);
+                    sleep(1000);
+                    kick.setPosition(0.6);
+                    sleep(1000);
+                    kick.setPosition(0.15);
+                    sleep(1000);
+                    out.setPower(0);
+                    out1.setPower(0);
+                    balls--;
+                } else {
+                    // Use the speed and turn "gains" to calculate how we want the robot to move.
+                    drive  = Range.clip(Math.pow(rangeError / EXPONENTIAL_RANGE, 3) * EXPONENTIAL_RANGE * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                    turn   = Range.clip(Math.pow(headingError / EXPONENTIAL_TURN_RANGE, 3) * EXPONENTIAL_TURN_RANGE * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                    strafe = Range.clip(Math.pow(-yawError / EXPONENTIAL_RANGE, 3) * EXPONENTIAL_RANGE * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+                    telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
+                    telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
+                    telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
+                    telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
+                    telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+                    telemetry.addData("April tag distance", desiredTag.ftcPose.y);
+                    telemetry.addData("changing angle",headingError);
+                }
+            } else {
+
+                drive  = 0;
+                strafe = 0;
+                turn   = 0.5;
+                telemetry.addData("Searching...","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
-            // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-            //moveRobot(drive, strafe, turn);
+            moveRobot(drive, strafe, turn);
             telemetry.update();
             sleep(10);
+
+            if(balls == 0){
+                if(desiredID == 20){
+                    moveRobot(0,1,0);
+                    sleep(2000);
+                    moveRobot(0,0,0);
+                    break;
+                } else {
+                    moveRobot(0,-1,0);
+                    sleep(2000);
+                    moveRobot(0,0,0);
+                    break;
+                }
+            }
         }
     }
 
