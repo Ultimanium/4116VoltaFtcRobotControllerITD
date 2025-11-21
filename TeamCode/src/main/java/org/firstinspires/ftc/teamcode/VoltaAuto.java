@@ -211,6 +211,7 @@ public class VoltaAuto extends LinearOpMode {
         selectStartingDelay();
 
         waitForStart();
+        linear.setPosition(0.6);
         sleep(delay);
         moveRobot(0.75,0,0);
         sleep(1500);
@@ -271,9 +272,10 @@ public class VoltaAuto extends LinearOpMode {
                 if((Math.abs(headingError) < 5 && Math.abs(rangeError) < 3  && Math.abs(yawError) < 3) && balls > 0){
                     telemetry.addData("LAUNCHING BALL NUM",3 - balls);
                     telemetry.update();
+                    linear.setPosition(0.6);
                     kick.setPosition(0.15);
-                    out.setPower(0.68);
-                    out1.setPower(-0.68);
+                    out.setPower(0.54);
+                    out1.setPower(-0.54);
                     moveRobot(0, 0, 0);
                     wheel.setPosition(ballArray[3 - balls]);
                     sleep(1000);
