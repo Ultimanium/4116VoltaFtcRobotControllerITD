@@ -183,6 +183,7 @@ public class VoltacularOp extends LinearOpMode {
             out.setPower(-0.68 * gamepad2.left_stick_y - ws);
             out1.setPower(0.68 * gamepad2.left_stick_y + ws);
 
+
             if(gamepad2.a){
             linear.setPosition(0.45);
             }
@@ -273,6 +274,7 @@ public class VoltacularOp extends LinearOpMode {
             linear.setPosition(power);
             telemetry.addData("LINEAR", linear.getPosition());
             telemetry.addData("test", test);
+            telemetry.addData("out",out.getPower());
             telemetry.update();
             sleep(10);
         }
