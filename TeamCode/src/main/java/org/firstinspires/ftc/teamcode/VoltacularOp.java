@@ -65,6 +65,8 @@ public class VoltacularOp extends LinearOpMode {
     private Servo linear = null;
     double  ws = 0;
     double test = 0;
+    double s = 0;
+    double sc = 0;
 
 
 
@@ -168,7 +170,7 @@ public class VoltacularOp extends LinearOpMode {
                 // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
                 drive  = -gamepad1.left_stick_y;
                 strafe = -gamepad1.left_stick_x;
-                turn   = -gamepad1.right_stick_x;
+                turn   = -gamepad1.right_stick_x/2;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
 
@@ -179,14 +181,26 @@ public class VoltacularOp extends LinearOpMode {
             if(test < 0.5){
                 intake.setPower(gamepad2.right_stick_y);
             }
-
-            out.setPower(-0.68 * gamepad2.left_stick_y - ws);
-            out1.setPower(0.68 * gamepad2.left_stick_y + ws);
-
-
-            if(gamepad2.a){
-            linear.setPosition(0.45);
+            out.setPower(-s * gamepad2.left_stick_y);
+            out1.setPower(s * gamepad2.left_stick_y);
+            if(gamepad1.x){
+                s = 0.54;
+                linear.setPosition(0.6);
             }
+            if(gamepad1.y){
+                s = 0.64;
+
+                linear.setPosition(0.5);
+            }
+            if(gamepad1.b){
+                s = 0.81;
+
+                linear.setPosition(0.3);
+            }
+
+
+
+
 
             if(gamepad1.a){
                 ws=-0.15;
@@ -267,11 +281,15 @@ public class VoltacularOp extends LinearOpMode {
             } else if ((!toggle1) && (!gamepad2.dpad_left) && (!gamepad2.dpad_right)){
                 toggle1 = true;
             }
+            if(gamepad1.right_bumper){
+                sc=0.5;
+            }else{
+                sc=1;
+            }
 
 
 
             moveRobot(drive, strafe, turn);
-            linear.setPosition(power);
             telemetry.addData("LINEAR", linear.getPosition());
             telemetry.addData("test", test);
             telemetry.addData("out",out.getPower());
@@ -300,10 +318,10 @@ public class VoltacularOp extends LinearOpMode {
         }
 
         // Send powers to the wheels.
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightBackDrive.setPower(rightBackPower);
+        leftFrontDrive.setPower(leftFrontPower*sc);
+        rightFrontDrive.setPower(rightFrontPower*sc);
+        leftBackDrive.setPower(leftBackPower*sc);
+        rightBackDrive.setPower(rightBackPower*sc);
     }
 
     //let there be a part two; electric boogaloo
