@@ -302,9 +302,15 @@ public class VoltaAuto extends LinearOpMode {
                 }
             } else {
 
-                drive  = 0;
-                strafe = 0;
-                turn   = 0.5;
+                if(desiredID == 20){
+                    drive  = 0;
+                    strafe = 0;
+                    turn   = 0.5;
+                } else {
+                    drive  = 0;
+                    strafe = 0;
+                    turn   = -0.5;
+                }
                 telemetry.addData("Searching...","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
             moveRobot(drive, strafe, turn);
