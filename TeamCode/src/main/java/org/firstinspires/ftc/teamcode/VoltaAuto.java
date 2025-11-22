@@ -274,8 +274,8 @@ public class VoltaAuto extends LinearOpMode {
                     telemetry.update();
                     linear.setPosition(0.6);
                     kick.setPosition(0.15);
-                    out.setPower(0.54);
-                    out1.setPower(-0.54);
+                    out.setPower(0.555);
+                    out1.setPower(-0.555);
                     moveRobot(0, 0, 0);
                     wheel.setPosition(ballArray[3 - balls]);
                     sleep(1000);
@@ -301,10 +301,15 @@ public class VoltaAuto extends LinearOpMode {
                     telemetry.addData("changing angle",headingError);
                 }
             } else {
-
-                drive  = 0;
-                strafe = 0;
-                turn   = 0.5;
+                if(desiredID == 20){
+                    drive  = 0;
+                    strafe = 0;
+                    turn   = 0.5;
+                } else {
+                    drive  = 0;
+                    strafe = 0;
+                    turn   = -0.5;
+                }
                 telemetry.addData("Searching...","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
             moveRobot(drive, strafe, turn);
