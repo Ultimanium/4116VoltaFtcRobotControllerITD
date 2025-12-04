@@ -18,7 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="Voltacular", group="Autonomous", preselectTeleOp = "VoltacularOp")
+@Autonomous(name="Voltacular (DEFUNCT)", group="Autonomous", preselectTeleOp = "VoltacularOp")
 
 public class VoltaAuto extends LinearOpMode {
 
@@ -49,11 +49,6 @@ public class VoltaAuto extends LinearOpMode {
 
     private DcMotor out = null;
     private DcMotor out1 = null;
-    // public Servo flap = null;
-    public float power = 0;
-    public boolean toggle = true;
-    public float power1 = 0;
-    public boolean toggle1 = true;
     private DcMotor intake = null;
     private Servo kick = null;
     private Servo wheel = null;
@@ -62,8 +57,6 @@ public class VoltaAuto extends LinearOpMode {
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
     private Servo linear = null;
-    double  ws = 0;
-    double test = 0;
 
     int desiredID = -1;
 
