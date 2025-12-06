@@ -203,6 +203,7 @@ public class VoltaAuto extends LinearOpMode {
         selectStartingPosition();
         selectStartingDelay();
 
+        wheel.setPosition(0.35);
         waitForStart();
         linear.setPosition(0.6);
         sleep(delay);

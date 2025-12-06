@@ -57,8 +57,8 @@ public class DriveConstants {
      * empirically tuned.
      */
     // public static double kV = 1.0 / rpmToVelocity(MAX_RPM)
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0.003;
+    public static double kV = 0.015222927426051514;
+    public static double kA = 0.0035;
     public static double kStatic = 0.01;
 
     /*
@@ -89,7 +89,7 @@ public class DriveConstants {
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
 
      */
-    public static double MAX_VEL = 79.26939782646593;
+    public static double MAX_VEL = 60;
     public static double MAX_ACCEL = 79.26939782646593;
     public static double MAX_ANG_VEL = Math.toRadians(313.22772);
     public static double MAX_ANG_ACCEL = Math.toRadians(313.22772);
