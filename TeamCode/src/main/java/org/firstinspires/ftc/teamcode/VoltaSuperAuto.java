@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -35,6 +36,9 @@ public class VoltaSuperAuto extends LinearOpMode {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
+    public final Pose2d TAGPOS = new Pose2d(58.66142, 55.90551, 54.046);
+
+    private boolean targetFound = false;
 
     private DcMotor out = null;
     private DcMotor out1 = null;
@@ -78,11 +82,51 @@ public class VoltaSuperAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         initVars();
-        if(USE_WEBCAM)
+        if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
         ballArray = new double[]{0.565, 0.192, 0.909};
         wheel.setPosition(0.35);
+
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+        Pose2d startPose = new Pose2d(0, 0, 0);
+        Pose2d endPose = new Pose2d(0, 0, 0);
+
         waitForStart();
+
+        targetFound = false;
+        desiredTag = null;
+
+        // Step through the list of detected tags and look for a matching tag
+        while (desiredTag == null && !isStopRequested()) {
+            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                // Look to see if we have size info on this tag.
+                if (detection.metadata != null) {
+                    //  Check to see if we want to track towards this tag.
+                    if (detection.id == currentTeam.getTagCode()) {
+                        // Yes, we want to use this tag.
+                        targetFound = true;
+                        desiredTag = detection;
+
+                        double range = desiredTag.ftcPose.range;
+                        double heading = desiredTag.ftcPose.bearing;
+                        double yaw = desiredTag.ftcPose.yaw;
+
+                        startPose = new Pose2d(desiredTag.ftcPose.range - TAGPOS.getX(), desiredTag.ftcPose.range - TAGPOS.getY(), desiredTag.ftcPose.range - TAGPOS.getHeading());
+
+                        break;  // don't look any further.
+                    } else {
+                        // This tag is in the library, but we do not want to track it right now.
+                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                    }
+                } else {
+                    // This tag is NOT in the library, so we don't have enough information to track to it.
+                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+                }
+            }
+        }
+
         while (opModeIsActive()) {
             if(balls > 0){
                 shootBall();
@@ -154,7 +198,6 @@ public class VoltaSuperAuto extends LinearOpMode {
             telemetry.update();
         }
 
-        // Stop yo shit
         if (!isStopRequested())
         {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
@@ -169,7 +212,6 @@ public class VoltaSuperAuto extends LinearOpMode {
             sleep(20);
         }
     }
-
     public void selectStartingPosition() {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
