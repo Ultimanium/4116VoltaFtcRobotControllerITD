@@ -34,8 +34,16 @@ public class VoltaSuperAuto extends LinearOpMode {
     private static final int DESIRED_TAG_ID = -1;
 
     private VisionPortal visionPortal;
-    private AprilTagProcessor aprilTag;
+    private AprilTagProcessor aprilTag = new AprilTagProcessor.Builder()
+            .setDrawAxes(true)
+            .setDrawCubeProjection(true)
+            .setDrawTagID(true)
+            .setDrawTagOutline(true)
+            .setLensIntrinsics(465.092,465.092,336.254,249.854)
+            .build();
+
     private AprilTagDetection desiredTag = null;
+    //public AprilTagProcessor.Builder builder = new AprilTagProcessor.Builder();
     public final Pose2d TAGPOS = new Pose2d(58.66142, 55.90551, 54.046);
 
     private boolean targetFound = false;
@@ -81,6 +89,8 @@ public class VoltaSuperAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
+
         initVars();
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
@@ -109,10 +119,13 @@ public class VoltaSuperAuto extends LinearOpMode {
                         targetFound = true;
                         desiredTag = detection;
 
-                        double range = desiredTag.ftcPose.range;
-                        double heading = desiredTag.ftcPose.bearing;
+                        double x = desiredTag.ftcPose.x;
+                        double y = desiredTag.ftcPose.y;
                         double yaw = desiredTag.ftcPose.yaw;
-
+                        telemetry.addData("x", x);
+                        telemetry.addData("y", y);
+                        telemetry.addData("z", yaw);
+                        telemetry.update();
                         startPose = new Pose2d(desiredTag.ftcPose.range - TAGPOS.getX(), desiredTag.ftcPose.range - TAGPOS.getY(), desiredTag.ftcPose.range - TAGPOS.getHeading());
 
                         break;  // don't look any further.
@@ -127,10 +140,16 @@ public class VoltaSuperAuto extends LinearOpMode {
             }
         }
 
+        drive.setPoseEstimate(startPose);
+
+
         while (opModeIsActive()) {
+            /*
             if(balls > 0){
                 shootBall();
             }
+
+             */
         }
     }
 
@@ -317,6 +336,8 @@ public class VoltaSuperAuto extends LinearOpMode {
     }
 
     public void initVars(){
+
+
         initAprilTag();
 
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
