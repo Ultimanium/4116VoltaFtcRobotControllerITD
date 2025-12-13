@@ -243,7 +243,7 @@ public class VoltacularOp extends LinearOpMode {
                         sleep(250);
                     }
                     if (gamepad2.b && gamepad2.right_bumper) {
-                        wheel.setPosition(0.909);
+                        wheel.setPosition(0.938);
                         test = 1;
                         sleep(250);
                     }

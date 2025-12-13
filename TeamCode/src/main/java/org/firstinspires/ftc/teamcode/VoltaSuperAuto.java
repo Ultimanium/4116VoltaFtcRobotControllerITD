@@ -26,7 +26,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name="Voltacular", group="Autonomous", preselectTeleOp = "VoltacularOp")
+@Autonomous(name="Voltacular BACK", group="Autonomous", preselectTeleOp = "VoltacularOp")
 
 public class VoltaSuperAuto extends LinearOpMode {
 
@@ -44,7 +44,7 @@ public class VoltaSuperAuto extends LinearOpMode {
 
     private AprilTagDetection desiredTag = null;
     //public AprilTagProcessor.Builder builder = new AprilTagProcessor.Builder();
-    public final Pose2d TAGPOS = new Pose2d(58.66142, 55.90551, 54.046);
+    public final Pose2d TAGPOS = new Pose2d(58.66142, 55.90551, 180 - 54.046);
 
     private boolean targetFound = false;
 
@@ -89,25 +89,68 @@ public class VoltaSuperAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-
         initVars();
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
-        ballArray = new double[]{0.565, 0.192, 0.909};
+        ballArray = new double[]{0.565, 0.192, 0.938};
         wheel.setPosition(0.35);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        Pose2d startPose;
+        Pose2d endPose;
+        Pose2d shootPosition;
+        if(currentTeam == TEAM.BLUE){
+            startPose = new Pose2d(0, 0, 0);
+            endPose = new Pose2d(1, 25, 0);
+            shootPosition = new Pose2d(8, 0, Math.toRadians(26));
+        } else {
+            startPose = new Pose2d(0, 0, 0);
+            endPose = new Pose2d(1, -25, 0);
+            shootPosition = new Pose2d(8, 0, Math.toRadians(-26));
+        }
 
-        Pose2d startPose = new Pose2d(0, 0, 0);
-        Pose2d endPose = new Pose2d(0, 0, 0);
+        drive.setPoseEstimate(startPose);
+
+        Trajectory toShoot = drive.trajectoryBuilder(startPose)
+                .lineToLinearHeading(shootPosition)
+                .build();
+        Trajectory end = drive.trajectoryBuilder(toShoot.end())
+                .lineToLinearHeading(endPose)
+                .build();
 
         waitForStart();
+
+
 
         targetFound = false;
         desiredTag = null;
 
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Is ts real?
+            if (detection.metadata != null) {
+                // Do we want ts?
+                 if (detection.id == 21){
+                    // GPP
+                    ballArray = new double[]{0.565, 0.192, 0.938};
+                } else if (detection.id == 22){
+                    // PGP
+                    ballArray = new double[]{0.192, 0.565, 0.938};
+                } else if (detection.id == 23){
+                    // PPG
+                    ballArray = new double[]{0.192, 0.938, 0.565};
+                } else {
+                    // nuh uh
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                }
+            } else {
+                // ts does not exist :(
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
+
         // Step through the list of detected tags and look for a matching tag
+        /*
         while (desiredTag == null && !isStopRequested()) {
             List<AprilTagDetection> currentDetections = aprilTag.getDetections();
             for (AprilTagDetection detection : currentDetections) {
@@ -119,14 +162,30 @@ public class VoltaSuperAuto extends LinearOpMode {
                         targetFound = true;
                         desiredTag = detection;
 
-                        double x = desiredTag.ftcPose.x;
-                        double y = desiredTag.ftcPose.y;
-                        double yaw = desiredTag.ftcPose.yaw;
+                        double relX = desiredTag.ftcPose.x;
+                        double relY = desiredTag.ftcPose.y;
+                        double hypo = Math.sqrt(Math.pow(relX, 2) + Math.pow(relY, 2));
+                        double relYaw = Math.toRadians(desiredTag.ftcPose.yaw);
+                        double angle1;
+                        if(currentTeam == TEAM.BLUE){
+                            angle1 = relYaw - Math.toRadians(TAGPOS.getHeading());
+                        } else {
+                            angle1 = relYaw + Math.toRadians(TAGPOS.getHeading());
+                        }
+                        double x = TAGPOS.getX() + (Math.cos(angle1) * hypo);
+                        double y = TAGPOS.getY() + (Math.sin(angle1) * hypo);
+                        double yaw = Math.atan(relX/relY) - (Math.PI/2) + angle1;
+
+
+                        telemetry.addData("angle1", angle1);
+                        telemetry.addData("hypo", hypo);
+                        telemetry.addData("relX", relX);
                         telemetry.addData("x", x);
                         telemetry.addData("y", y);
-                        telemetry.addData("z", yaw);
+                        telemetry.addData("rot", yaw);
+                        telemetry.addData("relYaw", relYaw);
                         telemetry.update();
-                        startPose = new Pose2d(desiredTag.ftcPose.range - TAGPOS.getX(), desiredTag.ftcPose.range - TAGPOS.getY(), desiredTag.ftcPose.range - TAGPOS.getHeading());
+                        startPose = new Pose2d(x, y, yaw);
 
                         break;  // don't look any further.
                     } else {
@@ -140,34 +199,51 @@ public class VoltaSuperAuto extends LinearOpMode {
             }
         }
 
-        drive.setPoseEstimate(startPose);
+         */
 
+        out.setPower(0.75);
+        out1.setPower(-0.75);
+
+        drive.followTrajectory(toShoot);
+
+        sleep(1000);
+
+        while (balls > 0){
+            shootBall();
+        }
+
+        sleep(1000);
+
+        out.setPower(0);
+        out1.setPower(-0);
+
+        drive.followTrajectory(end);
 
         while (opModeIsActive()) {
-            /*
-            if(balls > 0){
-                shootBall();
-            }
 
-             */
+            //List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+
+
+            //telemetry.update();
+
+            drive.update();
+
+
         }
     }
 
     public void shootBall(){
         telemetry.addData("LAUNCHING BALL NUM",3 - balls);
         telemetry.update();
-        linear.setPosition(0.6);
+        linear.setPosition(0.15);
         kick.setPosition(0.15);
-        out.setPower(0.555);
-        out1.setPower(-0.555);
         wheel.setPosition(ballArray[3 - balls]);
         sleep(500);
         kick.setPosition(0.6);
         sleep(400);
         kick.setPosition(0.15);
         sleep(350);
-        out.setPower(0);
-        out1.setPower(0);
         balls--;
     }
 
@@ -235,37 +311,6 @@ public class VoltaSuperAuto extends LinearOpMode {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
         currentTeam = TEAM.BLUE;
-        /*
-        while (!isStopRequested()) {
-            telemetry.addData("Initializing Autonomous Mode for Team ", "4116");
-            telemetry.addData("---------------------------------------", "");
-            telemetry.addData("Set Position using bumpers on gamepad 1:", "");
-            telemetry.addData("Setting Position to  ", position);
-            telemetry.addData("\n press A on gamepad 1 to confirm", "");
-            if (gamepad1.a) {
-                break;
-            }
-            if (gamepad1.left_bumper) {
-                position = VoltaAuto.START_POSITION.Left;
-                while (gamepad1.left_bumper && !isStopRequested()) {
-                    telemetry.addData("Remove your hand from the left bumper NOW.", "");
-                    telemetry.update();
-                }
-            }
-            if (gamepad1.right_bumper) {
-                position = VoltaAuto.START_POSITION.Right;
-                while (gamepad1.dpad_down && !isStopRequested()) {
-                    telemetry.addData("Remove your hand from the right bumper NOW.", "");
-                    telemetry.update();
-                }
-            }
-            telemetry.update();
-        }
-        while (gamepad1.a && !isStopRequested()) {
-            telemetry.addData("Remove your hand from the a button.", "");
-            telemetry.update();
-        }
-         */
         while (!isStopRequested()) {
             telemetry.addData("Initializing Autonomous Mode for Team ", "4116");
             telemetry.addData("---------------------------------------", "");

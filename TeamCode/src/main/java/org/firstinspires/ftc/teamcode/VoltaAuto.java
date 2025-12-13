@@ -18,7 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="Voltacular (DEFUNCT)", group="Autonomous", preselectTeleOp = "VoltacularOp")
+@Autonomous(name="Voltacular FRONT", group="Autonomous", preselectTeleOp = "VoltacularOp")
 
 public class VoltaAuto extends LinearOpMode {
 
@@ -268,15 +268,15 @@ public class VoltaAuto extends LinearOpMode {
                     telemetry.update();
                     linear.setPosition(0.6);
                     kick.setPosition(0.15);
-                    out.setPower(0.54);
-                    out1.setPower(-0.54);
-                    moveRobot(0, 0, 0);
+                    out.setPower(0.555);
+                    out1.setPower(-0.555);
+                    moveRobot(0,0,0);
                     wheel.setPosition(ballArray[3 - balls]);
-                    sleep(1000);
+                    sleep(500);
                     kick.setPosition(0.6);
-                    sleep(1000);
+                    sleep(400);
                     kick.setPosition(0.15);
-                    sleep(1000);
+                    sleep(350);
                     out.setPower(0);
                     out1.setPower(0);
                     balls--;
