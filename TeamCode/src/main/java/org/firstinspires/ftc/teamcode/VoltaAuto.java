@@ -218,7 +218,7 @@ public class VoltaAuto extends LinearOpMode {
             // Step through the list of detected tags and look for a matching tag
             List<AprilTagDetection> currentDetections = aprilTag.getDetections();
             for (AprilTagDetection detection : currentDetections) {
-                // Is ts real?
+                // Is real?
                 if (detection.metadata != null) {
                     // Do we want ts?
                     if ((detection.id == desiredID) && ballArray[0] != -1) {
@@ -240,7 +240,7 @@ public class VoltaAuto extends LinearOpMode {
                         telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
                     }
                 } else {
-                    // ts does not exist :(
+                    // does not exist :(
                     telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
                 }
             }
@@ -433,7 +433,7 @@ public class VoltaAuto extends LinearOpMode {
             telemetry.update();
         }
 
-        // Stop yo shit
+        // Stop
         if (!isStopRequested())
         {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
