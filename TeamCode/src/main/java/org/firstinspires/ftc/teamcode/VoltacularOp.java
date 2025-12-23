@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -63,10 +64,14 @@ public class VoltacularOp extends LinearOpMode {
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
     private Servo linear = null;
+    private ColorSensor cs = null;
     double  ws = 0;
     double test = 0;
     double s = 0;
     double sc = 0;
+    private ColorSensor bcs = null;
+    private ColorSensor tcs = null;
+
 
 
 
@@ -97,6 +102,9 @@ public class VoltacularOp extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
+        tcs = hardwareMap.get(ColorSensor.class, "topColor");
+
 
         //ashbaby
         if (USE_WEBCAM)
@@ -195,7 +203,7 @@ public class VoltacularOp extends LinearOpMode {
             if(gamepad1.b){
                 s = 0.81;
 
-                linear.setPosition(0.3);
+                linear.setPosition(0.15);
             }
 
 
@@ -229,21 +237,21 @@ public class VoltacularOp extends LinearOpMode {
                         test = 0;
                     }
                     if (gamepad2.b) {
-                        wheel.setPosition(0.384);
+                        wheel.setPosition(0.354);
                         test = 0;
                     }
                     if (gamepad2.x && gamepad2.right_bumper) {
-                        wheel.setPosition(0.565);
+                        wheel.setPosition(0.535);
                         test = 1;
                         sleep(250);
                     }
                     if (gamepad2.y && gamepad2.right_bumper) {
-                        wheel.setPosition(0.192);
+                        wheel.setPosition(0.162);
                         test = 1;
                         sleep(250);
                     }
                     if (gamepad2.b && gamepad2.right_bumper) {
-                        wheel.setPosition(0.938);
+                        wheel.setPosition(0.908);
                         test = 1;
                         sleep(250);
                     }
@@ -316,12 +324,16 @@ public class VoltacularOp extends LinearOpMode {
             leftBackPower /= max;
             rightBackPower /= max;
         }
-
         // Send powers to the wheels.
         leftFrontDrive.setPower(leftFrontPower*sc);
         rightFrontDrive.setPower(rightFrontPower*sc);
         leftBackDrive.setPower(leftBackPower*sc);
         rightBackDrive.setPower(rightBackPower*sc);
+        telemetry.addData("Color sensor value blue", bcs.blue());
+        telemetry.addData("Color sensor value red", bcs.red());
+        telemetry.addData("Color sensor value green", bcs.green());
+        telemetry.addData("Color sensor value argb", bcs.argb());
+        telemetry.update();
     }
 
     //let there be a part two; electric boogaloo
@@ -384,6 +396,7 @@ public class VoltacularOp extends LinearOpMode {
             GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
             gainControl.setGain(gain);
             sleep(20);
+
         }
     }
 }

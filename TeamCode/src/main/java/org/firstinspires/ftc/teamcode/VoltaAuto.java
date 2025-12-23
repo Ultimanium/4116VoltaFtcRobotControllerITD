@@ -206,6 +206,7 @@ public class VoltaAuto extends LinearOpMode {
         wheel.setPosition(0.35);
         waitForStart();
         linear.setPosition(0.6);
+        wheel.setPosition(0.35);
         sleep(delay);
         moveRobot(0.75,0,0);
         sleep(1500);
@@ -229,12 +230,21 @@ public class VoltaAuto extends LinearOpMode {
                     } else if (detection.id == 21){
                         // GPP
                         ballArray = new double[]{0.565, 0.192, 0.909};
+                        if(balls == 3){
+                            wheel.setPosition(0.565);
+                        }
                     } else if (detection.id == 22){
                         // PGP
                         ballArray = new double[]{0.192, 0.565, 0.909};
+                        if(balls == 3){
+                            wheel.setPosition(0.192);
+                        }
                     } else if (detection.id == 23){
                         // PPG
                         ballArray = new double[]{0.192, 0.909, 0.565};
+                        if(balls == 3){
+                            wheel.setPosition(0.192);
+                        }
                     } else {
                         // nuh uh
                         telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
