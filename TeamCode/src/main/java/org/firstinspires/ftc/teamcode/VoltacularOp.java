@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -71,8 +72,52 @@ public class VoltacularOp extends LinearOpMode {
     double sc = 0;
     private ColorSensor bcs = null;
     private ColorSensor tcs = null;
+    private TouchSensor intakeTouch = null;
 
+    public enum COLOR {
+        GREEN,
+        PURPLE
+    }
+    public enum BALL {
 
+        GREEN01(COLOR.GREEN, 1),
+        GREEN02(COLOR.GREEN, 2),
+        GREEN03(COLOR.GREEN, 3),
+        PURPLE01(COLOR.PURPLE, 1),
+        PURPLE02(COLOR.PURPLE, 2),
+        PURPLE03(COLOR.PURPLE, 3);
+
+        private COLOR ballColor;
+
+        private int ballPos;
+
+        public final double[] INPUTPOSITIONS = {0,0.354,0.7272};
+        public final double[] OUTPUTPOSITIONS = {0.565, 0.909, 0.192};
+
+        BALL(COLOR ballColor, int ballPos) {
+            this.ballColor = ballColor;
+            this.ballPos = ballPos;
+        }
+
+        public COLOR getColor() {
+            return ballColor;
+        }
+
+        public int getBallPos() {
+            return ballPos;
+        }
+
+        public double getBallInput() {
+            return INPUTPOSITIONS[ballPos];
+        }
+
+        public double getBallOutput() {
+            return OUTPUTPOSITIONS[ballPos];
+        }
+    }
+    public BALL[] Balls = {null,null,null};
+
+    private BALL ProtoBall = BALL.GREEN01;
 
 
     @Override
@@ -104,6 +149,7 @@ public class VoltacularOp extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
+        intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
 
 
         //ashbaby
@@ -258,6 +304,17 @@ public class VoltacularOp extends LinearOpMode {
                 }
             }
 
+            if(test == 0){
+                bcs.enableLed(true);
+                tcs.enableLed(false);
+                if(intakeTouch.isPressed() && bcs.alpha() > 1000){
+
+                }
+            } else {
+                bcs.enableLed(false);
+                tcs.enableLed(true);
+            }
+
             if(gamepad2.dpad_down && toggle){
                 toggle = false;
                 power -= 0.05f;
@@ -301,7 +358,7 @@ public class VoltacularOp extends LinearOpMode {
             telemetry.addData("LINEAR", linear.getPosition());
             telemetry.addData("test", test);
             telemetry.addData("out",out.getPower());
-            telemetry.update();
+            //telemetry.update();
             sleep(10);
         }
     }
@@ -332,7 +389,9 @@ public class VoltacularOp extends LinearOpMode {
         telemetry.addData("Color sensor value blue", bcs.blue());
         telemetry.addData("Color sensor value red", bcs.red());
         telemetry.addData("Color sensor value green", bcs.green());
-        telemetry.addData("Color sensor value argb", bcs.argb());
+        telemetry.addData("Color sensor value alpha", bcs.alpha());
+        telemetry.addData("Color sensor value fixed green", bcs.green() / bcs.alpha());
+        telemetry.addData("Color sensor value fixed green", ((bcs.red() + bcs.blue()) / 2) / bcs.alpha());
         telemetry.update();
     }
 

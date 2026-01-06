@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -57,11 +58,13 @@ public class VoltaAuto extends LinearOpMode {
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
     private Servo linear = null;
+    private TouchSensor intakeTouch = null;
 
     int desiredID = -1;
 
     int balls = 3;
     double[] ballArray = {-1,-1,-1};
+    double[] ballInputArray = {0,0.354,0.7272};
     long delay = 0;
 
     public enum START_POSITION{
@@ -191,6 +194,7 @@ public class VoltaAuto extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
         linear = hardwareMap.get(Servo.class, "li");
+        intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -202,6 +206,41 @@ public class VoltaAuto extends LinearOpMode {
 
         selectStartingPosition();
         selectStartingDelay();
+
+        /*
+        balls = 0;
+        wheel.setPosition(0);
+        waitForStart();
+        intake.setPower(1);
+        while(balls < 3){
+            telemetry.addData("touched", intakeTouch.getValue());
+            telemetry.addData("balls", balls);
+            telemetry.update();
+            if(intakeTouch.isPressed()){
+                balls++;
+                if(balls < 3){
+                    wheel.setPosition(ballInputArray[balls]);
+                    sleep(300);
+                }
+            }
+        }
+        ballArray = new double[]{0.565, 0.192, 0.909};
+        while(balls > 0) {
+            linear.setPosition(0.6);
+            kick.setPosition(0.15);
+            out.setPower(0.555);
+            out1.setPower(-0.555);
+            wheel.setPosition(ballArray[3 - balls]);
+            sleep(500);
+            kick.setPosition(0.6);
+            sleep(400);
+            kick.setPosition(0.15);
+            sleep(350);
+            out.setPower(0);
+            out1.setPower(0);
+            balls--;
+        }
+        */
 
         wheel.setPosition(0.35);
         waitForStart();
