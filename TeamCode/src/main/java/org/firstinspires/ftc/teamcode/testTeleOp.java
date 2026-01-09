@@ -4,6 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -50,8 +54,8 @@ public class testTeleOp extends LinearOpMode {
 
     // Nathaniel's play area end
 
-    private DcMotor out = null;
-    private DcMotor out1 = null;
+    private DcMotorEx out = null;
+    private DcMotorEx out1 = null;
     // public Servo flap = null;
     public float power = 0;
     public boolean toggle = true;
@@ -136,8 +140,13 @@ public class testTeleOp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
-        out = hardwareMap.get(DcMotor.class, "lr");
-        out1 = hardwareMap.get(DcMotor.class, "ll");
+        out = hardwareMap.get(DcMotorEx.class, "lr");
+        out1 = hardwareMap.get(DcMotorEx.class, "ll");
+        out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out.setDirection(DcMotorSimple.Direction.FORWARD);
+        out1.setDirection(DcMotorSimple.Direction.REVERSE);
+
         // flap = hardwareMap.get(Servo.class, "door");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
@@ -151,6 +160,8 @@ public class testTeleOp extends LinearOpMode {
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
 
+        PIDFCoefficients test1 = new PIDFCoefficients(1, 0, 0, 1);
+        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
 
         //ashbaby
         if (USE_WEBCAM)
@@ -235,7 +246,15 @@ public class testTeleOp extends LinearOpMode {
             if(test < 0.5){
                 intake.setPower(gamepad2.right_stick_y);
             }
-            out.setPower(-s * gamepad2.left_stick_y);
+
+            out.setVelocity(100);
+            double velocity = out.getVelocity();
+            double error = 100-out.getVelocity();
+            telemetry.addData("velocity", velocity);
+            telemetry.addData("error", error);
+
+
+          /*  out.setPower(-s * gamepad2.left_stick_y);
             out1.setPower(s * gamepad2.left_stick_y);
             if(gamepad1.x){
                 s = 0.54;
@@ -252,7 +271,7 @@ public class testTeleOp extends LinearOpMode {
                 linear.setPosition(0.15);
             }
 
-
+*/
 
 
 
