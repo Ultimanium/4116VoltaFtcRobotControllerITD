@@ -77,6 +77,10 @@ public class testTeleOp extends LinearOpMode {
     private ColorSensor bcs = null;
     private ColorSensor tcs = null;
     private TouchSensor intakeTouch = null;
+    double[] size = {10, 1, 0.1, 0.01, 0.001};
+    int index = 1;
+     double P = 0;
+     double F = 0;
 
     public enum COLOR {
         GREEN,
@@ -160,8 +164,7 @@ public class testTeleOp extends LinearOpMode {
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
 
-        PIDFCoefficients test1 = new PIDFCoefficients(1, 0, 0, 1);
-        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+
 
         //ashbaby
         if (USE_WEBCAM)
@@ -246,12 +249,40 @@ public class testTeleOp extends LinearOpMode {
             if(test < 0.5){
                 intake.setPower(gamepad2.right_stick_y);
             }
-
-            out.setVelocity(100);
-            double velocity = out.getVelocity();
-            double error = 100-out.getVelocity();
+            if(gamepad2.dpad_up){
+                index = index+1;
+            }
+            if(gamepad2.dpad_down){
+                index = index-1;
+            }
+            if(index<1){
+                index = 1;
+            }
+            if(index>5){
+                index = 5;
+            }
+            if(gamepad2.right_bumper){
+                F = F+ size[index];
+            }
+            if(gamepad2.left_bumper){
+                F = F- size[index];
+            }
+            if(gamepad2.dpad_right){
+                P = P+ size[index];
+            }if(gamepad2.dpad_left){
+                P = P- size[index];
+            }
+            out1.setVelocity(100);
+            double velocity = out1.getVelocity();
+            double error = 100-out1.getVelocity();
             telemetry.addData("velocity", velocity);
             telemetry.addData("error", error);
+            telemetry.addData("index", index);
+            telemetry.addData("P", P);
+            telemetry.addData("F", F);
+
+            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
 
 
           /*  out.setPower(-s * gamepad2.left_stick_y);
