@@ -283,6 +283,7 @@ public class testTeleOp extends LinearOpMode {
 
             PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+            // P = , F =
 
 
           /*  out.setPower(-s * gamepad2.left_stick_y);
