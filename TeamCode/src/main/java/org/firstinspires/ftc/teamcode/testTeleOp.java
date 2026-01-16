@@ -153,6 +153,7 @@ public class testTeleOp extends LinearOpMode {
         out1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // flap = hardwareMap.get(Servo.class, "door");
+
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
@@ -242,6 +243,17 @@ public class testTeleOp extends LinearOpMode {
                 turn   = -gamepad1.right_stick_x/2;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
+            if(gamepad1.x){
+                linear.setPosition(0.6);
+            }
+            if(gamepad1.y){
+
+                linear.setPosition(0.5);
+            }
+            if(gamepad1.b){
+
+                linear.setPosition(0.15);
+            }
             if(gamepad2.dpad_up){
                 l=l+0.05;
             }
@@ -257,10 +269,10 @@ public class testTeleOp extends LinearOpMode {
                 intake.setPower(gamepad2.right_stick_y);
             }
             if(index<1){
-                index = 1;
+                index = 5;
             }
             if(index>5){
-                index = 5;
+                index = 1;
             }
             if(gamepad1.dpad_up){
                 F = F+ size[index];
@@ -273,19 +285,31 @@ public class testTeleOp extends LinearOpMode {
             }if(gamepad1.dpad_left){
                 P = P- size[index];
             }
-            out1.setVelocity(3240);
-            double velocity = out1.getVelocity();
-            double error = 3240-out1.getVelocity();
-            out.setVelocity(out1.getVelocity());
-            telemetry.addData("velocity", velocity);
-            telemetry.addData("error", error);
-            telemetry.addData("index", index);
-            telemetry.addData("P", P);
-            telemetry.addData("F", F);
+            if(gamepad1.right_bumper){
+                index=index+1;
+            }
+            if(gamepad1.left_bumper){
+                index=index-1;
+            }
+
+
+
+            if(Math.abs(gamepad2.left_stick_y) > 0.05){
+                out1.setVelocity(3240);
+                double velocity = out1.getVelocity();
+                double error = 3240-out1.getVelocity();
+                out.setVelocity(out1.getVelocity());
             PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
             PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+                telemetry.addData("velocity", velocity);
+                telemetry.addData("error", error);
+                telemetry.addData("index", index);
+                telemetry.addData("P", P);
+                telemetry.addData("F", F);
+                telemetry.addData("touch", intakeTouch.getValue());}
+
             // P = 19.2, F = 21.2
 
 
@@ -307,7 +331,7 @@ public class testTeleOp extends LinearOpMode {
                     sleep(250);
                 }
                 if(test>0.5){
-                    kick.setPosition(0.75);
+                    kick.setPosition(0.6);
                     runtime.reset();
                 }
             }else{
