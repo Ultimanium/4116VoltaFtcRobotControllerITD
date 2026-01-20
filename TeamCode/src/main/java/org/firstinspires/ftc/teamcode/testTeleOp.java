@@ -268,7 +268,7 @@ public class testTeleOp extends LinearOpMode {
             if(test < 0.5){
                 intake.setPower(gamepad2.right_stick_y);
             }
-            if(index<1){
+       /*     if(index<1){
                 index = 5;
             }
             if(index>5){
@@ -293,7 +293,7 @@ public class testTeleOp extends LinearOpMode {
             }
 
 
-
+*/
             if(Math.abs(gamepad2.left_stick_y) > 0.05){
 
                 if(gamepad1.x){
@@ -301,9 +301,9 @@ public class testTeleOp extends LinearOpMode {
                 double velocity = out1.getVelocity();
                 double error = 3240-out1.getVelocity();
                 out.setVelocity(out1.getVelocity());
-            PIDFCoefficients test2 = new PIDFCoefficients(P, 15.5, 0, F);
+            PIDFCoefficients test2 = new PIDFCoefficients(15.5, 0, 0, 0);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(P, 15.5, 0, F);
+            PIDFCoefficients test1 = new PIDFCoefficients(15.5, 0, 0, 0);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     telemetry.addData("velocity", velocity);
                     telemetry.addData("error", error);
@@ -316,9 +316,9 @@ public class testTeleOp extends LinearOpMode {
                     double velocity = out1.getVelocity();
                     double error = 3240-out1.getVelocity();
                     out.setVelocity(out1.getVelocity());
-                    PIDFCoefficients test2 = new PIDFCoefficients(P, 17, 0, F);
+                    PIDFCoefficients test2 = new PIDFCoefficients(17, 0, 0, 0);
                     out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                    PIDFCoefficients test1 = new PIDFCoefficients(P, 17, 0, F);
+                    PIDFCoefficients test1 = new PIDFCoefficients(17, 0, 0, 0);
                     out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     telemetry.addData("velocity", velocity);
                     telemetry.addData("error", error);
@@ -331,9 +331,9 @@ public class testTeleOp extends LinearOpMode {
                     double velocity = out1.getVelocity();
                     double error = 3240-out1.getVelocity();
                     out.setVelocity(out1.getVelocity());
-                    PIDFCoefficients test2 = new PIDFCoefficients(P, 27.89, 0, F);
+                    PIDFCoefficients test2 = new PIDFCoefficients(27.89, 0, 0, 0);
                     out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                    PIDFCoefficients test1 = new PIDFCoefficients(P, 27.89, 0, F);
+                    PIDFCoefficients test1 = new PIDFCoefficients(27.89, 0, 0, 0);
                     out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     telemetry.addData("velocity", velocity);
                     telemetry.addData("error", error);
