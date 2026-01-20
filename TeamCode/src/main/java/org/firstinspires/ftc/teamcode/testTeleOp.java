@@ -245,13 +245,17 @@ public class testTeleOp extends LinearOpMode {
             }
             if(gamepad1.x){
                 linear.setPosition(0.6);
+                P = 15.5;
+                F = 0;
             }
             if(gamepad1.y){
-
-                linear.setPosition(0.5);
+                P = 17.25;
+                F = 0;
+                linear.setPosition(0.525);
             }
             if(gamepad1.b){
-
+                P = 27.89;
+                F = 0;
                 linear.setPosition(0.15);
             }
             if(gamepad2.dpad_up){
@@ -293,57 +297,22 @@ public class testTeleOp extends LinearOpMode {
             }
 
 
-*/
-            if(Math.abs(gamepad2.left_stick_y) > 0.05){
+*/ //15.5, 17, 27.89
 
-                if(gamepad1.x){
-                out1.setVelocity(3240);
-                double velocity = out1.getVelocity();
-                double error = 3240-out1.getVelocity();
-                out.setVelocity(out1.getVelocity());
-            PIDFCoefficients test2 = new PIDFCoefficients(15.5, 0, 0, 0);
+            out1.setVelocity(gamepad2.left_stick_y* 3240);
+            double velocity = out1.getVelocity();
+            double error = 3240-out1.getVelocity();
+            out.setVelocity(out1.getVelocity());
+            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(15.5, 0, 0, 0);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
-                    telemetry.addData("velocity", velocity);
-                    telemetry.addData("error", error);
-                    telemetry.addData("index", index);
-                    telemetry.addData("P", P);
-                    telemetry.addData("F", F);
-                    telemetry.addData("touch", intakeTouch.getValue());}
-                if(gamepad1.y){
-                    out1.setVelocity(3240);
-                    double velocity = out1.getVelocity();
-                    double error = 3240-out1.getVelocity();
-                    out.setVelocity(out1.getVelocity());
-                    PIDFCoefficients test2 = new PIDFCoefficients(17, 0, 0, 0);
-                    out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                    PIDFCoefficients test1 = new PIDFCoefficients(17, 0, 0, 0);
-                    out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
-                    telemetry.addData("velocity", velocity);
-                    telemetry.addData("error", error);
-                    telemetry.addData("index", index);
-                    telemetry.addData("P", P);
-                    telemetry.addData("F", F);
-                    telemetry.addData("touch", intakeTouch.getValue());}
-                if(gamepad1.b){
-                    out1.setVelocity(3240);
-                    double velocity = out1.getVelocity();
-                    double error = 3240-out1.getVelocity();
-                    out.setVelocity(out1.getVelocity());
-                    PIDFCoefficients test2 = new PIDFCoefficients(27.89, 0, 0, 0);
-                    out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                    PIDFCoefficients test1 = new PIDFCoefficients(27.89, 0, 0, 0);
-                    out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
-                    telemetry.addData("velocity", velocity);
-                    telemetry.addData("error", error);
-                    telemetry.addData("index", index);
-                    telemetry.addData("P", P);
-                    telemetry.addData("F", F);
-                    telemetry.addData("touch", intakeTouch.getValue());}
-
-                }
-
+            telemetry.addData("velocity", velocity);
+            telemetry.addData("error", error);
+            telemetry.addData("index", index);
+            telemetry.addData("P", P);
+            telemetry.addData("F", F);
+            telemetry.addData("touch", intakeTouch.getValue());
             // P = 19.2, F = 21.2
 
 
