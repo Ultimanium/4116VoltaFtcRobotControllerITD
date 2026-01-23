@@ -77,11 +77,13 @@ public class testTeleOp extends LinearOpMode {
     private ColorSensor bcs = null;
     private ColorSensor tcs = null;
     private TouchSensor intakeTouch = null;
+    private Servo lift = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
      double P = 0;
      double F = 0;
      double l = 0;
+     double li = 0;
 
     public enum COLOR {
         GREEN,
@@ -153,7 +155,7 @@ public class testTeleOp extends LinearOpMode {
         out1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // flap = hardwareMap.get(Servo.class, "door");
-
+        lift = hardwareMap.get(Servo.class, "up");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
@@ -243,6 +245,13 @@ public class testTeleOp extends LinearOpMode {
                 turn   = -gamepad1.right_stick_x/2;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
+            if(gamepad2.left_bumper && gamepad2.right_bumper){
+                li = 1;
+            }
+
+            lift.setPosition(li);
+            telemetry.addData("li", lift.getPosition());
+
             if(gamepad1.x){
                 linear.setPosition(0.6);
                 P = 15.5;
