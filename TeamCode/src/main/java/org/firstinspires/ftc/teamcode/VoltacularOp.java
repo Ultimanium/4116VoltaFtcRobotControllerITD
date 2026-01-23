@@ -4,6 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -50,8 +54,8 @@ public class VoltacularOp extends LinearOpMode {
 
     // Nathaniel's play area end
 
-    private DcMotor out = null;
-    private DcMotor out1 = null;
+    private DcMotorEx out = null;
+    private DcMotorEx out1 = null;
     // public Servo flap = null;
     public float power = 0;
     public boolean toggle = true;
@@ -73,6 +77,13 @@ public class VoltacularOp extends LinearOpMode {
     private ColorSensor bcs = null;
     private ColorSensor tcs = null;
     private TouchSensor intakeTouch = null;
+    private Servo lift = null;
+    double[] size = {10, 1, 0.1, 0.01, 0.001};
+    int index = 1;
+    double P = 0;
+    double F = 0;
+    double l = 0;
+    double li = 0;
 
     public enum COLOR {
         GREEN,
@@ -136,9 +147,15 @@ public class VoltacularOp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
-        out = hardwareMap.get(DcMotor.class, "lr");
-        out1 = hardwareMap.get(DcMotor.class, "ll");
-       // flap = hardwareMap.get(Servo.class, "door");
+        out = hardwareMap.get(DcMotorEx.class, "lr");
+        out1 = hardwareMap.get(DcMotorEx.class, "ll");
+        out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out.setDirection(DcMotorSimple.Direction.FORWARD);
+        out1.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // flap = hardwareMap.get(Servo.class, "door");
+        lift = hardwareMap.get(Servo.class, "up");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
@@ -150,6 +167,7 @@ public class VoltacularOp extends LinearOpMode {
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
+
 
 
         //ashbaby
@@ -227,6 +245,34 @@ public class VoltacularOp extends LinearOpMode {
                 turn   = -gamepad1.right_stick_x/2;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
+            if(gamepad2.left_bumper && gamepad2.right_bumper){
+                li = 1;
+            }
+
+            lift.setPosition(li);
+            telemetry.addData("li", lift.getPosition());
+
+            if(gamepad1.x){
+                linear.setPosition(0.6);
+                P = 15.5;
+                F = 0;
+            }
+            if(gamepad1.y){
+                P = 17.25;
+                F = 0;
+                linear.setPosition(0.525);
+            }
+            if(gamepad1.b){
+                P = 27.89;
+                F = 0;
+                linear.setPosition(0.15);
+            }
+            if(gamepad2.dpad_up){
+                l=l+0.05;
+            }
+            if(gamepad2.dpad_down){
+                l=l-0.05;
+            }
 
             if(test > 0.5){
                 intake.setPower(0);
@@ -235,22 +281,51 @@ public class VoltacularOp extends LinearOpMode {
             if(test < 0.5){
                 intake.setPower(gamepad2.right_stick_y);
             }
-            out.setPower(-s * gamepad2.left_stick_y);
-            out1.setPower(s * gamepad2.left_stick_y);
-            if(gamepad1.x){
-                s = 0.54;
-                linear.setPosition(0.6);
+       /*     if(index<1){
+                index = 5;
             }
-            if(gamepad1.y){
-                s = 0.64;
+            if(index>5){
+                index = 1;
+            }
+            if(gamepad1.dpad_up){
+                F = F+ size[index];
+            }
+            if(gamepad1.dpad_down){
+                F = F- size[index];
+            }
+            if(gamepad1.dpad_right){
+                P = P+ size[index];
+            }if(gamepad1.dpad_left){
+                P = P- size[index];
+            }
+            if(gamepad1.right_bumper){
+                index=index+1;
+            }
+            if(gamepad1.left_bumper){
+                index=index-1;
+            }
 
-                linear.setPosition(0.5);
-            }
-            if(gamepad1.b){
-                s = 0.81;
 
-                linear.setPosition(0.15);
-            }
+*/ //15.5, 17, 27.89
+
+            out1.setVelocity(gamepad2.left_stick_y* 3240);
+            double velocity = out1.getVelocity();
+            double error = 3240-out1.getVelocity();
+            out.setVelocity(out1.getVelocity());
+            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+            out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+            telemetry.addData("velocity", velocity);
+            telemetry.addData("error", error);
+            telemetry.addData("index", index);
+            telemetry.addData("P", P);
+            telemetry.addData("F", F);
+            telemetry.addData("touch", intakeTouch.getValue());
+            // P = 19.2, F = 21.2
+
+
+
 
 
 
