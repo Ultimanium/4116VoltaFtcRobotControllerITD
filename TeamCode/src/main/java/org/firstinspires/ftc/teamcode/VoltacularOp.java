@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class VoltacularOp extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime lastIntake = new ElapsedTime();
 
     // Nathaniel's play area
 
@@ -80,45 +80,41 @@ public class VoltacularOp extends LinearOpMode {
     }
     public enum BALL {
 
-        GREEN01(COLOR.GREEN, 1),
-        GREEN02(COLOR.GREEN, 2),
-        GREEN03(COLOR.GREEN, 3),
-        PURPLE01(COLOR.PURPLE, 1),
-        PURPLE02(COLOR.PURPLE, 2),
-        PURPLE03(COLOR.PURPLE, 3);
+        GREEN(COLOR.GREEN, 0),
+        PURPLE(COLOR.PURPLE, 0);
 
         private COLOR ballColor;
-
-        private int ballPos;
 
         public final double[] INPUTPOSITIONS = {0,0.354,0.7272};
         public final double[] OUTPUTPOSITIONS = {0.565, 0.909, 0.192};
 
         BALL(COLOR ballColor, int ballPos) {
             this.ballColor = ballColor;
-            this.ballPos = ballPos;
         }
 
         public COLOR getColor() {
             return ballColor;
         }
 
-        public int getBallPos() {
-            return ballPos;
-        }
-
-        public double getBallInput() {
-            return INPUTPOSITIONS[ballPos];
-        }
-
-        public double getBallOutput() {
-            return OUTPUTPOSITIONS[ballPos];
+        public COLOR getInverseColor() {
+            if(ballColor == COLOR.GREEN){
+                return COLOR.PURPLE;
+            } else {
+                return COLOR.GREEN;
+            }
         }
     }
     public BALL[] Balls = {null,null,null};
 
-    private BALL ProtoBall = BALL.GREEN01;
+    private BALL ProtoBall = BALL.GREEN;
 
+    public int focusedBall = 0;
+
+    public COLOR[] BallQueue = {null, null, null};
+
+    public int shootStage = 0;
+
+    public Boolean ShootToLoad = false;
 
     @Override
     public void runOpMode() {
@@ -157,6 +153,8 @@ public class VoltacularOp extends LinearOpMode {
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
 
         waitForStart();
+        wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
+        lastIntake.reset();
         while (opModeIsActive()) {
             targetFound = false;
             desiredTag  = null;
@@ -227,14 +225,6 @@ public class VoltacularOp extends LinearOpMode {
                 turn   = -gamepad1.right_stick_x/2;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
-
-            if(test > 0.5){
-                intake.setPower(0);
-            }
-
-            if(test < 0.5){
-                intake.setPower(gamepad2.right_stick_y);
-            }
             out.setPower(-s * gamepad2.left_stick_y);
             out1.setPower(s * gamepad2.left_stick_y);
             if(gamepad1.x){
@@ -262,6 +252,7 @@ public class VoltacularOp extends LinearOpMode {
                 ws = 0;
             }
             telemetry.addData("Power", power);
+            /*
             if(gamepad2.left_bumper){
                 if(test<0.5){
                     kick.setPosition(0.15);
@@ -304,13 +295,87 @@ public class VoltacularOp extends LinearOpMode {
                 }
             }
 
-            if(test == 0){
+             */
+            telemetry.addData("TestInput", false);
+
+            if(gamepad2.left_bumper && (Balls[0] == null || Balls[1] == null || Balls[2] == null) && shootStage == 0) {
+                telemetry.addData("TestInput", true);
                 bcs.enableLed(true);
                 tcs.enableLed(false);
-                if(intakeTouch.isPressed() && bcs.alpha() > 1000){
-
+                intake.setPower(1);
+                wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
+                if(!ShootToLoad || lastIntake.milliseconds() > 1250){
+                    ShootToLoad = false;
+                    if (bcs.alpha() > 250 && lastIntake.milliseconds() > 600) {
+                        telemetry.addData("FinalInput", true);
+                        lastIntake.reset();
+                        if ((bcs.red() + bcs.blue()) / 2.0 > bcs.green()) {
+                            Balls[focusedBall] = BALL.PURPLE;
+                        } else {
+                            Balls[focusedBall] = BALL.GREEN;
+                        }
+                        for (int i = 0; i < Balls.length; i++) {
+                            if (Balls[i] == null) {
+                                focusedBall = i;
+                                break;
+                            }
+                        }
+                    }
                 }
             } else {
+                if(shootStage == 0){
+                    if(BallQueue[0] == null && BallQueue[1] == null && BallQueue[2] == null) {
+                        if (gamepad2.y) {
+                            BallQueue = new COLOR[]{COLOR.GREEN, null, null};
+                        } else if (gamepad2.x) {
+                            BallQueue = new COLOR[]{COLOR.PURPLE, null, null};
+                        } else if (gamepad2.b) {
+                            BallQueue = new COLOR[]{COLOR.GREEN, COLOR.PURPLE, COLOR.PURPLE};
+                        }
+                    } else if(BallQueue[0] != null){
+                        boolean foundBall = false;
+                        for (int i = 0; i < Balls.length; i++) {
+                            if (Balls[i] != null && Balls[i].getColor() == BallQueue[0]) {
+                                focusedBall = i;
+                                foundBall = true;
+                                break;
+                            }
+                        }
+                        if(!foundBall){
+                            for (int i = 0; i < Balls.length; i++) {
+                                if (Balls[i] != null) {
+                                    focusedBall = i;
+                                    foundBall = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if(foundBall){
+                            shootStage = 1;
+                        }
+                    }
+                    lastIntake.reset();
+                } else if(shootStage == 1 && lastIntake.milliseconds() > 500){
+                    kick.setPosition(0.6);
+                    shootStage = 2;
+                    lastIntake.reset();
+                } else if(shootStage == 2 && lastIntake.milliseconds() > 400){
+                    kick.setPosition(0.15);
+                    shootStage = 3;
+                    lastIntake.reset();
+                } else if(shootStage == 3 && lastIntake.milliseconds() > 350){
+                    Balls[focusedBall] = null;
+                    BallQueue[0] = BallQueue[1];
+                    BallQueue[1] = BallQueue[2];
+                    BallQueue[2] = null;
+                    shootStage = 0;
+                    lastIntake.reset();
+                }
+
+
+                ShootToLoad = true;
+                intake.setPower(0);
+                wheel.setPosition(ProtoBall.OUTPUTPOSITIONS[focusedBall]);
                 bcs.enableLed(false);
                 tcs.enableLed(true);
             }
@@ -386,12 +451,17 @@ public class VoltacularOp extends LinearOpMode {
         rightFrontDrive.setPower(rightFrontPower*sc);
         leftBackDrive.setPower(leftBackPower*sc);
         rightBackDrive.setPower(rightBackPower*sc);
-        telemetry.addData("Color sensor value blue", bcs.blue());
-        telemetry.addData("Color sensor value red", bcs.red());
-        telemetry.addData("Color sensor value green", bcs.green());
-        telemetry.addData("Color sensor value alpha", bcs.alpha());
-        telemetry.addData("Color sensor value fixed green", bcs.green() / bcs.alpha());
-        telemetry.addData("Color sensor value fixed green", ((bcs.red() + bcs.blue()) / 2) / bcs.alpha());
+        telemetry.addData("LastIntake", lastIntake.milliseconds());
+        telemetry.addData("ShootStage", shootStage);
+        telemetry.addData("BallQueue", BallQueue[0] + ", "+ BallQueue[1] + ", "+ BallQueue[2]);
+        if(Balls[0] != null)
+            telemetry.addData("1", Balls[0].getColor());
+        if(Balls[1] != null)
+            telemetry.addData("2", Balls[1].getColor());
+        if(Balls[2] != null)
+            telemetry.addData("3", Balls[2].getColor());
+        telemetry.addData("Color sensor value fixed green", bcs.green() / ((double)bcs.alpha()));
+        telemetry.addData("Color sensor value fixed green", ((bcs.red() + bcs.blue()) / 2.0) / ((double)bcs.alpha()));
         telemetry.update();
     }
 
