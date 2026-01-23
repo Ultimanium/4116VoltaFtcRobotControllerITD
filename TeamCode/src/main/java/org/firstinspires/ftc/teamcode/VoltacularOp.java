@@ -127,6 +127,8 @@ public class VoltacularOp extends LinearOpMode {
 
     public Boolean ShootToLoad = false;
 
+    public double outPower = 0;
+
     @Override
     public void runOpMode() {
 
@@ -243,8 +245,10 @@ public class VoltacularOp extends LinearOpMode {
                 turn   = -gamepad1.right_stick_x/2;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
-            if(gamepad2.left_bumper && gamepad2.right_bumper){
+            if(gamepad2.right_bumper && gamepad2.a){
                 li = 1;
+            } else {
+                li = 0;
             }
 
             lift.setPosition(li);
@@ -270,14 +274,6 @@ public class VoltacularOp extends LinearOpMode {
             }
             if(gamepad2.dpad_down){
                 l=l-0.05;
-            }
-
-            if(test > 0.5){
-                intake.setPower(0);
-            }
-
-            if(test < 0.5){
-                intake.setPower(gamepad2.right_stick_y);
             }
        /*     if(index<1){
                 index = 5;
@@ -306,7 +302,7 @@ public class VoltacularOp extends LinearOpMode {
 
 */ //15.5, 17, 27.89
 
-            out1.setVelocity(gamepad2.left_stick_y* 3240);
+            out1.setVelocity(outPower * 3240);
             double velocity = out1.getVelocity();
             double error = 3240-out1.getVelocity();
             out.setVelocity(out1.getVelocity());
@@ -321,14 +317,6 @@ public class VoltacularOp extends LinearOpMode {
             telemetry.addData("F", F);
             telemetry.addData("touch", intakeTouch.getValue());
             // P = 19.2, F = 21.2
-
-
-
-
-
-
-
-
             if(gamepad1.a){
                 ws=-0.15;
             }else if (gamepad1.b){
@@ -399,6 +387,7 @@ public class VoltacularOp extends LinearOpMode {
                         }
                         for (int i = 0; i < Balls.length; i++) {
                             if (Balls[i] == null) {
+                                outPower = 1;
                                 focusedBall = i;
                                 break;
                             }
@@ -447,6 +436,7 @@ public class VoltacularOp extends LinearOpMode {
                     shootStage = 3;
                     lastIntake.reset();
                 } else if(shootStage == 3 && lastIntake.milliseconds() > 350){
+                    outPower = 0;
                     Balls[focusedBall] = null;
                     BallQueue[0] = BallQueue[1];
                     BallQueue[1] = BallQueue[2];
