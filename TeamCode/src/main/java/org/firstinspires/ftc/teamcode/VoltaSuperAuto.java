@@ -3,9 +3,14 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -30,6 +35,9 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 public class VoltaSuperAuto extends LinearOpMode {
 
+    private ElapsedTime lastIntake = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
+
     private static final boolean USE_WEBCAM = true;
     private static final int DESIRED_TAG_ID = -1;
 
@@ -48,8 +56,8 @@ public class VoltaSuperAuto extends LinearOpMode {
 
     private boolean targetFound = false;
 
-    private DcMotor out = null;
-    private DcMotor out1 = null;
+    private DcMotorEx out = null;
+    private DcMotorEx out1 = null;
     private DcMotor intake = null;
     private Servo kick = null;
     private Servo wheel = null;
@@ -58,10 +66,25 @@ public class VoltaSuperAuto extends LinearOpMode {
     private DcMotor leftBackDrive    = null;
     private DcMotor rightBackDrive   = null;
     private Servo linear = null;
+    private ColorSensor bcs = null;
 
     int balls = 3;
     double[] ballArray = {-1,-1,-1};
+    double[] ballInputArray = {0,0.354,0.7272};
     long delay = 0;
+
+    double P = 24;
+    double F = 0;
+
+    public VoltacularOp.BALL[] Balls = {null,null,null};
+
+    private VoltacularOp.BALL ProtoBall = VoltacularOp.BALL.GREEN;
+
+    public int focusedBall = 0;
+
+    public VoltacularOp.COLOR[] BallSequence = {null, null, null};
+
+    public VoltaAuto.START_POSITION position;
 
     public enum TEAM {
         BLUE("Blue", 20),
@@ -99,14 +122,20 @@ public class VoltaSuperAuto extends LinearOpMode {
         Pose2d startPose;
         Pose2d endPose;
         Pose2d shootPosition;
+        Pose2d inputStart;
+        Pose2d[] inputs;
         if(currentTeam == TEAM.BLUE){
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, 25, 0);
             shootPosition = new Pose2d(8, 0, Math.toRadians(26));
+            inputStart = new Pose2d(28, 15, Math.toRadians(-90));
+            inputs = new Pose2d[] {new Pose2d(28, 20, Math.toRadians(-90)), new Pose2d(28, 25, Math.toRadians(-90)), new Pose2d(28, 30, Math.toRadians(-90))};
         } else {
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, -25, 0);
             shootPosition = new Pose2d(8, 0, Math.toRadians(-26));
+            inputStart = new Pose2d(28, 15, Math.toRadians(90));
+            inputs = new Pose2d[] {new Pose2d(28, -20, Math.toRadians(90)), new Pose2d(28, -25, Math.toRadians(90)), new Pose2d(28, -30, Math.toRadians(90))};
         }
 
         drive.setPoseEstimate(startPose);
@@ -114,12 +143,27 @@ public class VoltaSuperAuto extends LinearOpMode {
         Trajectory toShoot = drive.trajectoryBuilder(startPose)
                 .lineToLinearHeading(shootPosition)
                 .build();
-        Trajectory end = drive.trajectoryBuilder(toShoot.end())
+        Trajectory toBalls = drive.trajectoryBuilder(toShoot.end())
+                .lineToLinearHeading(inputStart)
+                .build();
+        Trajectory toBall1 = drive.trajectoryBuilder(toBalls.end())
+                .lineToLinearHeading(inputs[0])
+                .build();
+        Trajectory toBall2 = drive.trajectoryBuilder(toBall1.end())
+                .lineToLinearHeading(inputs[1])
+                .build();
+        Trajectory toBall3 = drive.trajectoryBuilder(toBall2.end())
+                .lineToLinearHeading(inputs[2])
+                .build();
+        Trajectory toShootAgain = drive.trajectoryBuilder(toBall3.end())
+                .lineToLinearHeading(shootPosition)
+                .build();
+        Trajectory end = drive.trajectoryBuilder(toShootAgain.end())
                 .lineToLinearHeading(endPose)
                 .build();
 
         waitForStart();
-
+        linear.setPosition(0.15);
 
 
         targetFound = false;
@@ -133,12 +177,18 @@ public class VoltaSuperAuto extends LinearOpMode {
                  if (detection.id == 21){
                     // GPP
                     ballArray = new double[]{0.565, 0.192, 0.938};
+                     BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE};
+                     VoltacularOp.colorSequence = BallSequence;
                 } else if (detection.id == 22){
                     // PGP
                     ballArray = new double[]{0.192, 0.565, 0.938};
+                     BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE};
+                     VoltacularOp.colorSequence = BallSequence;
                 } else if (detection.id == 23){
                     // PPG
                     ballArray = new double[]{0.192, 0.938, 0.565};
+                     BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN};
+                     VoltacularOp.colorSequence = BallSequence;
                 } else {
                     // nuh uh
                     telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
@@ -213,9 +263,24 @@ public class VoltaSuperAuto extends LinearOpMode {
         }
 
         sleep(1000);
+        wheel.setPosition(0);
 
         out.setPower(0);
         out1.setPower(-0);
+
+        intake.setPower(1);
+        while(balls < 3){
+            telemetry.addData("touched", bcs.alpha() > 250);
+            telemetry.addData("balls", balls);
+            telemetry.update();
+            if(bcs.alpha() > 250 && lastIntake.milliseconds() > 600){
+                balls++;
+                if(balls < 3){
+                    wheel.setPosition(ballInputArray[balls]);
+                    sleep(300);
+                }
+            }
+        }
 
         drive.followTrajectory(end);
 
@@ -238,12 +303,48 @@ public class VoltaSuperAuto extends LinearOpMode {
         telemetry.update();
         linear.setPosition(0.15);
         kick.setPosition(0.15);
+        out1.setVelocity(3240);
+        out.setVelocity(out1.getVelocity());
+        PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+        PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+        out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         wheel.setPosition(ballArray[3 - balls]);
-        sleep(500);
+        runtime.reset();
+        while(runtime.milliseconds() < 500){
+            out1.setVelocity(3240);
+            out.setVelocity(out1.getVelocity());
+            test2 = new PIDFCoefficients(P, 0, 0, F);
+            out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+            test1 = new PIDFCoefficients(P, 0, 0, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+        }
         kick.setPosition(0.6);
-        sleep(400);
+        runtime.reset();
+        while(runtime.milliseconds() < 400){
+            out1.setVelocity(3240);
+            out.setVelocity(out1.getVelocity());
+            test2 = new PIDFCoefficients(P, 0, 0, F);
+            out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+            test1 = new PIDFCoefficients(P, 0, 0, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+        }
         kick.setPosition(0.15);
-        sleep(350);
+        runtime.reset();
+        while(runtime.milliseconds() < 350){
+            out1.setVelocity(3240);
+            out.setVelocity(out1.getVelocity());
+            test2 = new PIDFCoefficients(P, 0, 0, F);
+            out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+            test1 = new PIDFCoefficients(P, 0, 0, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+        }
+        out1.setVelocity(0);
+        out.setVelocity(out1.getVelocity());
+        test2 = new PIDFCoefficients(P, 0, 0, F);
+        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+        test1 = new PIDFCoefficients(P, 0, 0, F);
+        out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         balls--;
     }
 
@@ -389,8 +490,12 @@ public class VoltaSuperAuto extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
-        out = hardwareMap.get(DcMotor.class, "lr");
-        out1 = hardwareMap.get(DcMotor.class, "ll");
+        out = hardwareMap.get(DcMotorEx.class, "lr");
+        out1 = hardwareMap.get(DcMotorEx.class, "ll");
+        out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out.setDirection(DcMotorSimple.Direction.FORWARD);
+        out1.setDirection(DcMotorSimple.Direction.REVERSE);
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
@@ -399,6 +504,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
 
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur

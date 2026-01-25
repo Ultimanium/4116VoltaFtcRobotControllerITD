@@ -4,8 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -24,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 public class VoltaAuto extends LinearOpMode {
 
     // Nathaniel's play area
+
+    private ElapsedTime runtime = new ElapsedTime();
 
     final double DESIRED_DISTANCE = 48.0;
 
@@ -48,8 +54,8 @@ public class VoltaAuto extends LinearOpMode {
 
     // Nathaniel's play area end
 
-    private DcMotor out = null;
-    private DcMotor out1 = null;
+    private DcMotorEx out = null;
+    private DcMotorEx out1 = null;
     private DcMotor intake = null;
     private Servo kick = null;
     private Servo wheel = null;
@@ -71,6 +77,17 @@ public class VoltaAuto extends LinearOpMode {
         Left,
         Right
     }
+
+    double P = 15.5;
+    double F = 0;
+
+    public VoltacularOp.BALL[] Balls = {null,null,null};
+
+    private VoltacularOp.BALL ProtoBall = VoltacularOp.BALL.GREEN;
+
+    public int focusedBall = 0;
+
+    public VoltacularOp.COLOR[] BallSequence = {null, null, null};
 
     public VoltaAuto.START_POSITION position;
 
@@ -187,8 +204,12 @@ public class VoltaAuto extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
-        out = hardwareMap.get(DcMotor.class, "lr");
-        out1 = hardwareMap.get(DcMotor.class, "ll");
+        out = hardwareMap.get(DcMotorEx.class, "lr");
+        out1 = hardwareMap.get(DcMotorEx.class, "ll");
+        out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        out.setDirection(DcMotorSimple.Direction.FORWARD);
+        out1.setDirection(DcMotorSimple.Direction.REVERSE);
        // flap = hardwareMap.get(Servo.class, "door");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
@@ -269,18 +290,24 @@ public class VoltaAuto extends LinearOpMode {
                     } else if (detection.id == 21){
                         // GPP
                         ballArray = new double[]{0.565, 0.192, 0.909};
+                        BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE};
+                        VoltacularOp.colorSequence = BallSequence;
                         if(balls == 3){
                             wheel.setPosition(0.565);
                         }
                     } else if (detection.id == 22){
                         // PGP
                         ballArray = new double[]{0.192, 0.565, 0.909};
+                        BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE};
+                        VoltacularOp.colorSequence = BallSequence;
                         if(balls == 3){
                             wheel.setPosition(0.192);
                         }
                     } else if (detection.id == 23){
                         // PPG
                         ballArray = new double[]{0.192, 0.909, 0.565};
+                        BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN};
+                        VoltacularOp.colorSequence = BallSequence;
                         if(balls == 3){
                             wheel.setPosition(0.192);
                         }
@@ -317,17 +344,49 @@ public class VoltaAuto extends LinearOpMode {
                     telemetry.update();
                     linear.setPosition(0.6);
                     kick.setPosition(0.15);
-                    out.setPower(0.555);
-                    out1.setPower(-0.555);
+                    out1.setVelocity(3240);
+                    out.setVelocity(out1.getVelocity());
+                    PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+                    out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+                    PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+                    out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     moveRobot(0,0,0);
                     wheel.setPosition(ballArray[3 - balls]);
-                    sleep(500);
+                    runtime.reset();
+                    while(runtime.milliseconds() < 500){
+                        out1.setVelocity(3240);
+                        out.setVelocity(out1.getVelocity());
+                        test2 = new PIDFCoefficients(P, 0, 0, F);
+                        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+                        test1 = new PIDFCoefficients(P, 0, 0, F);
+                        out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+                    }
                     kick.setPosition(0.6);
-                    sleep(400);
+                    runtime.reset();
+                    while(runtime.milliseconds() < 400){
+                        out1.setVelocity(3240);
+                        out.setVelocity(out1.getVelocity());
+                        test2 = new PIDFCoefficients(P, 0, 0, F);
+                        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+                        test1 = new PIDFCoefficients(P, 0, 0, F);
+                        out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+                    }
                     kick.setPosition(0.15);
-                    sleep(350);
-                    out.setPower(0);
-                    out1.setPower(0);
+                    runtime.reset();
+                    while(runtime.milliseconds() < 350){
+                        out1.setVelocity(3240);
+                        out.setVelocity(out1.getVelocity());
+                        test2 = new PIDFCoefficients(P, 0, 0, F);
+                        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+                        test1 = new PIDFCoefficients(P, 0, 0, F);
+                        out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+                    }
+                    out1.setVelocity(0);
+                    out.setVelocity(out1.getVelocity());
+                    test2 = new PIDFCoefficients(P, 0, 0, F);
+                    out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+                    test1 = new PIDFCoefficients(P, 0, 0, F);
+                    out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     balls--;
                 } else {
                     // Use the speed and turn "gains" to calculate how we want the robot to move.

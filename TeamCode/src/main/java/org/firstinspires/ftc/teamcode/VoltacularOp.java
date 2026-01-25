@@ -80,7 +80,7 @@ public class VoltacularOp extends LinearOpMode {
     private Servo lift = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
-    double P = 0;
+    double P = 15.5;
     double F = 0;
     double l = 0;
     double li = 0;
@@ -122,6 +122,10 @@ public class VoltacularOp extends LinearOpMode {
     public int focusedBall = 0;
 
     public COLOR[] BallQueue = {null, null, null};
+
+    public static COLOR[] colorSequence;
+
+    public COLOR[] colorSequenceOnInit;
 
     public int shootStage = 0;
 
@@ -171,6 +175,12 @@ public class VoltacularOp extends LinearOpMode {
         //ashbaby
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+
+        if(colorSequence != null){
+            colorSequenceOnInit = colorSequence;
+        } else {
+            colorSequenceOnInit = new COLOR[]{COLOR.PURPLE, COLOR.PURPLE, COLOR.GREEN};
+        }
 
         waitForStart();
         wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
@@ -370,6 +380,7 @@ public class VoltacularOp extends LinearOpMode {
             telemetry.addData("TestInput", false);
 
             if(gamepad2.left_bumper && (Balls[0] == null || Balls[1] == null || Balls[2] == null) && shootStage == 0) {
+                BallQueue = new COLOR[] {null, null, null};
                 telemetry.addData("TestInput", true);
                 bcs.enableLed(true);
                 tcs.enableLed(false);
@@ -387,7 +398,6 @@ public class VoltacularOp extends LinearOpMode {
                         }
                         for (int i = 0; i < Balls.length; i++) {
                             if (Balls[i] == null) {
-                                outPower = 1;
                                 focusedBall = i;
                                 break;
                             }
@@ -402,7 +412,9 @@ public class VoltacularOp extends LinearOpMode {
                         } else if (gamepad2.x) {
                             BallQueue = new COLOR[]{COLOR.PURPLE, null, null};
                         } else if (gamepad2.b) {
-                            BallQueue = new COLOR[]{COLOR.GREEN, COLOR.PURPLE, COLOR.PURPLE};
+                            BallQueue[0] = colorSequenceOnInit[0];
+                            BallQueue[1] = colorSequenceOnInit[1];
+                            BallQueue[2] = colorSequenceOnInit[2];
                         }
                     } else if(BallQueue[0] != null){
                         boolean foundBall = false;
@@ -423,7 +435,10 @@ public class VoltacularOp extends LinearOpMode {
                             }
                         }
                         if(foundBall){
+                            outPower = 1;
                             shootStage = 1;
+                        } else {
+                            BallQueue = new COLOR[] {null, null, null};
                         }
                     }
                     lastIntake.reset();
@@ -493,7 +508,7 @@ public class VoltacularOp extends LinearOpMode {
 
 
             moveRobot(drive, strafe, turn);
-            telemetry.addData("LINEAR", linear.getPosition());
+            telemetry.addData("BallOutput", outPower);
             telemetry.addData("test", test);
             telemetry.addData("out",out.getPower());
             //telemetry.update();
@@ -527,6 +542,7 @@ public class VoltacularOp extends LinearOpMode {
         telemetry.addData("LastIntake", lastIntake.milliseconds());
         telemetry.addData("ShootStage", shootStage);
         telemetry.addData("BallQueue", BallQueue[0] + ", "+ BallQueue[1] + ", "+ BallQueue[2]);
+        telemetry.addData("StoredSequence", colorSequenceOnInit[0] + ", "+ colorSequenceOnInit[1] + ", "+ colorSequenceOnInit[2]);
         if(Balls[0] != null)
             telemetry.addData("1", Balls[0].getColor());
         if(Balls[1] != null)
