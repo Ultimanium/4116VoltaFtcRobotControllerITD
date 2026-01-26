@@ -155,6 +155,11 @@ public class VoltaSuperAuto extends LinearOpMode {
         Trajectory toBall3 = drive.trajectoryBuilder(toBall2.end())
                 .lineToLinearHeading(inputs[2])
                 .build();
+        Trajectory[] allBalls = {
+                toBall1,
+                toBall2,
+                toBall3
+        };
         Trajectory toShootAgain = drive.trajectoryBuilder(toBall3.end())
                 .lineToLinearHeading(shootPosition)
                 .build();
@@ -251,36 +256,67 @@ public class VoltaSuperAuto extends LinearOpMode {
 
          */
 
-        out.setPower(0.75);
-        out1.setPower(-0.75);
+        drive.followTrajectoryAsync(toShoot);
 
-        drive.followTrajectory(toShoot);
-
-        sleep(1000);
+        while(drive.isBusy()){
+            drive.update();
+            out1.setVelocity(3240);
+            out.setVelocity(out1.getVelocity());
+            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+            out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+        }
 
         while (balls > 0){
             shootBall();
         }
 
         sleep(1000);
-        wheel.setPosition(0);
+        wheel.setPosition(ballInputArray[0]);
 
         out.setPower(0);
         out1.setPower(-0);
 
         intake.setPower(1);
-        while(balls < 3){
+        drive.followTrajectoryAsync(allBalls[0]);
+        while(balls < 3 || drive.isBusy()){
             telemetry.addData("touched", bcs.alpha() > 250);
             telemetry.addData("balls", balls);
             telemetry.update();
-            if(bcs.alpha() > 250 && lastIntake.milliseconds() > 600){
+            if(drive.isBusy()){
+                drive.update();
+            }
+            if(bcs.alpha() > 250 && lastIntake.milliseconds() > 600 && balls < 3){
                 balls++;
                 if(balls < 3){
                     wheel.setPosition(ballInputArray[balls]);
-                    sleep(300);
+                    lastIntake.reset();
+                    while(drive.isBusy()){
+                        drive.update();
+                    }
+                    drive.followTrajectoryAsync(allBalls[balls]);
                 }
             }
         }
+
+        drive.followTrajectoryAsync(toShootAgain);
+
+        while(drive.isBusy()){
+            drive.update();
+            out1.setVelocity(3240);
+            out.setVelocity(out1.getVelocity());
+            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+            out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+        }
+
+        while (balls > 0){
+            shootBall();
+        }
+
+        sleep(1000);
 
         drive.followTrajectory(end);
 
