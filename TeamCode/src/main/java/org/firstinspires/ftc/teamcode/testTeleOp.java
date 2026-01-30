@@ -25,7 +25,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Disabled
 @TeleOp(name="OLD_TELEOP", group="Linear OpMode")
 
 public class testTeleOp extends LinearOpMode {

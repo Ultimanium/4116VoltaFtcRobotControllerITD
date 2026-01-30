@@ -73,7 +73,7 @@ public class VoltaSuperAuto extends LinearOpMode {
     double[] ballInputArray = {0,0.354,0.7272};
     long delay = 0;
 
-    double P = 24;
+    double P = 23;
     double F = 0;
 
     public VoltacularOp.BALL[] Balls = {null,null,null};
@@ -122,20 +122,23 @@ public class VoltaSuperAuto extends LinearOpMode {
         Pose2d startPose;
         Pose2d endPose;
         Pose2d shootPosition;
+        Pose2d shootPositionSecond;
         Pose2d inputStart;
         Pose2d[] inputs;
         if(currentTeam == TEAM.BLUE){
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, 25, 0);
-            shootPosition = new Pose2d(8, 0, Math.toRadians(26));
-            inputStart = new Pose2d(28, 15, Math.toRadians(-90));
-            inputs = new Pose2d[] {new Pose2d(28, 20, Math.toRadians(-90)), new Pose2d(28, 25, Math.toRadians(-90)), new Pose2d(28, 30, Math.toRadians(-90))};
+            shootPosition = new Pose2d(8, 0, Math.toRadians(21));
+            shootPositionSecond = new Pose2d(8, -3, Math.toRadians(21));
+            inputStart = new Pose2d(28, 5, -Math.toRadians(90));
+            inputs = new Pose2d[] {new Pose2d(28, 16.5, -Math.toRadians(90)), new Pose2d(28, 21, -Math.toRadians(90)), new Pose2d(28, 27, -Math.toRadians(90))};
         } else {
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, -25, 0);
-            shootPosition = new Pose2d(8, 0, Math.toRadians(-26));
-            inputStart = new Pose2d(28, 15, Math.toRadians(90));
-            inputs = new Pose2d[] {new Pose2d(28, -20, Math.toRadians(90)), new Pose2d(28, -25, Math.toRadians(90)), new Pose2d(28, -30, Math.toRadians(90))};
+            shootPosition = new Pose2d(8, 0, -Math.toRadians(21));
+            shootPositionSecond = new Pose2d(8, 3, -Math.toRadians(21));
+            inputStart = new Pose2d(28, -5, Math.toRadians(90));
+            inputs = new Pose2d[] {new Pose2d(28, -16.5, Math.toRadians(90)), new Pose2d(28, -21, Math.toRadians(90)), new Pose2d(28, -27, Math.toRadians(90))};
         }
 
         drive.setPoseEstimate(startPose);
@@ -161,7 +164,7 @@ public class VoltaSuperAuto extends LinearOpMode {
                 toBall3
         };
         Trajectory toShootAgain = drive.trajectoryBuilder(toBall3.end())
-                .lineToLinearHeading(shootPosition)
+                .lineToLinearHeading(shootPositionSecond)
                 .build();
         Trajectory end = drive.trajectoryBuilder(toShootAgain.end())
                 .lineToLinearHeading(endPose)
@@ -279,26 +282,42 @@ public class VoltaSuperAuto extends LinearOpMode {
         out1.setPower(-0);
 
         intake.setPower(1);
-        drive.followTrajectoryAsync(allBalls[0]);
-        while(balls < 3 || drive.isBusy()){
+        drive.followTrajectory(toBalls);
+        //drive.followTrajectoryAsync(allBalls[0]);
+        moveRobot(-0.25,0,0);
+        while(balls < 3){
             telemetry.addData("touched", bcs.alpha() > 250);
             telemetry.addData("balls", balls);
             telemetry.update();
-            if(drive.isBusy()){
-                drive.update();
-            }
+            drive.update();
             if(bcs.alpha() > 250 && lastIntake.milliseconds() > 600 && balls < 3){
                 balls++;
                 if(balls < 3){
+                    moveRobot(-0.25 - (0.15 * balls),0,0);
                     wheel.setPosition(ballInputArray[balls]);
                     lastIntake.reset();
-                    while(drive.isBusy()){
-                        drive.update();
+                    if(balls == 2){
+                        moveRobot(0,0,0);
+                        sleep(500);
+                        moveRobot(-0.25 - (0.15 * balls),0,0);
                     }
-                    drive.followTrajectoryAsync(allBalls[balls]);
+                    //while(drive.isBusy()){
+                        //drive.update();
+                    //}
+                    //drive.followTrajectoryAsync(allBalls[balls]);
                 }
             }
         }
+        moveRobot(0,0,0);
+
+        sleep(1000);
+
+        toShootAgain = drive.trajectoryBuilder(drive.getPoseEstimate())
+                .lineToLinearHeading(shootPositionSecond)
+                .build();
+        end = drive.trajectoryBuilder(toShootAgain.end())
+                .lineToLinearHeading(endPose)
+                .build();
 
         drive.followTrajectoryAsync(toShootAgain);
 
@@ -312,6 +331,8 @@ public class VoltaSuperAuto extends LinearOpMode {
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
 
+        intake.setPower(0);
+
         while (balls > 0){
             shootBall();
         }
@@ -321,6 +342,9 @@ public class VoltaSuperAuto extends LinearOpMode {
         drive.followTrajectory(end);
 
         while (opModeIsActive()) {
+
+            out.setPower(0);
+            out1.setPower(0);
 
             //List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -473,6 +497,31 @@ public class VoltaSuperAuto extends LinearOpMode {
             }
             telemetry.update();
         }
+    }
+
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower    =  x -y -yaw;
+        double rightFrontPower   =  x +y +yaw;
+        double leftBackPower     =  x +y -yaw;
+        double rightBackPower    =  x -y +yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+        // Send powers to the wheels.
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
     }
 
     public void selectStartingDelay() {
