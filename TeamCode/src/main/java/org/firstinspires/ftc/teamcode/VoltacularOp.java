@@ -85,14 +85,18 @@ public class VoltacularOp extends LinearOpMode {
     double l = 0;
     double li = 0;
 
+    public int[] PastOutputs = {0, 1, 2};
+
     public enum COLOR {
         GREEN,
-        PURPLE
+        PURPLE,
+        ANTINULL
     }
     public enum BALL {
 
         GREEN(COLOR.GREEN, 0),
-        PURPLE(COLOR.PURPLE, 0);
+        PURPLE(COLOR.PURPLE, 0),
+        ANTINULL(COLOR.ANTINULL, 0);
 
         private COLOR ballColor;
 
@@ -110,8 +114,10 @@ public class VoltacularOp extends LinearOpMode {
         public COLOR getInverseColor() {
             if(ballColor == COLOR.GREEN){
                 return COLOR.PURPLE;
-            } else {
+            } else if(ballColor == COLOR.PURPLE){
                 return COLOR.GREEN;
+            } else {
+                return COLOR.ANTINULL;
             }
         }
     }
@@ -419,6 +425,9 @@ public class VoltacularOp extends LinearOpMode {
                             BallQueue[0] = colorSequenceOnInit[0];
                             BallQueue[1] = colorSequenceOnInit[1];
                             BallQueue[2] = colorSequenceOnInit[2];
+                        } else if (gamepad2.a) {
+                            Balls[PastOutputs[2]] = BALL.ANTINULL;
+                            BallQueue = new COLOR[]{COLOR.ANTINULL, null, null};
                         }
                     } else if(BallQueue[0] != null){
                         boolean foundBall = false;
@@ -461,6 +470,17 @@ public class VoltacularOp extends LinearOpMode {
                     BallQueue[1] = BallQueue[2];
                     BallQueue[2] = null;
                     shootStage = 0;
+                    int tempCount = 0;
+                    int[] temp = {focusedBall, 0, 0};
+                    for(int i = 0; i < PastOutputs.length; i++){
+                        if(PastOutputs[i] != focusedBall){
+                            tempCount++;
+                            temp[tempCount] = PastOutputs[i];
+                        }
+                    }
+                    PastOutputs[0] = temp[0];
+                    PastOutputs[1] = temp[1];
+                    PastOutputs[2] = temp[2];
                     lastIntake.reset();
                 }
 
@@ -512,7 +532,7 @@ public class VoltacularOp extends LinearOpMode {
 
 
             moveRobot(drive, strafe, turn);
-            telemetry.addData("BallOutput", outPower);
+            telemetry.addData("BallPastQueue", PastOutputs[0] + ", " + PastOutputs[1] + ", " + PastOutputs[2]);
             telemetry.addData("test", test);
             telemetry.addData("out",out.getPower());
             //telemetry.update();
