@@ -149,6 +149,10 @@ public class VoltacularOp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         out = hardwareMap.get(DcMotorEx.class, "lr");
         out1 = hardwareMap.get(DcMotorEx.class, "ll");
         out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -174,7 +178,7 @@ public class VoltacularOp extends LinearOpMode {
 
         //ashbaby
         if (USE_WEBCAM)
-            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(1200, 5000);  // Use low exposure time to reduce motion blur
 
         if(colorSequence != null){
             colorSequenceOnInit = colorSequence;

@@ -75,7 +75,7 @@ public class VoltaSuperAuto extends LinearOpMode {
 
     double P = 19.2;
     double F = 21.2;
-    double flywheelPower = 1457.5;
+    double flywheelPower = 1400;
 
     public VoltacularOp.BALL[] Balls = {null,null,null};
 
@@ -595,7 +595,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
 
         if (USE_WEBCAM)
-            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(1200, 5000);  // Use low exposure time to reduce motion blur
 
         selectStartingPosition();
         selectStartingDelay();

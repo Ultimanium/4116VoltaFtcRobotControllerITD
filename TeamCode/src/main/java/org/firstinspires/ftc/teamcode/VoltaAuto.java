@@ -223,7 +223,7 @@ public class VoltaAuto extends LinearOpMode {
 
         //ashbaby
         if (USE_WEBCAM)
-            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(1200, 5000);  // Use low exposure time to reduce motion blur
 
         selectStartingPosition();
         selectStartingDelay();
