@@ -148,27 +148,27 @@ public class testTeleOp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
-        out = hardwareMap.get(DcMotorEx.class, "lr");
+       /* out = hardwareMap.get(DcMotorEx.class, "lr");
         out1 = hardwareMap.get(DcMotorEx.class, "ll");
         out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         out1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         out.setDirection(DcMotorSimple.Direction.FORWARD);
-        out1.setDirection(DcMotorSimple.Direction.REVERSE);
+        out1.setDirection(DcMotorSimple.Direction.REVERSE); */
 
         // flap = hardwareMap.get(Servo.class, "door");
-        lift = hardwareMap.get(Servo.class, "up");
+      //  lift = hardwareMap.get(Servo.class, "up");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
-        linear = hardwareMap.get(Servo.class, "li");
+       // linear = hardwareMap.get(Servo.class, "li");
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
+     /*   bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
-
+        */
 
 
         //ashbaby
@@ -250,10 +250,10 @@ public class testTeleOp extends LinearOpMode {
                 li = 1;
             }
 
-            lift.setPosition(li);
+     //       lift.setPosition(li);
             telemetry.addData("li", lift.getPosition());
 
-            if(gamepad1.x){
+         /*   if(gamepad1.x){
                 linear.setPosition(0.6);
                 P = 15.5;
                 F = 0;
@@ -305,11 +305,11 @@ public class testTeleOp extends LinearOpMode {
             if(gamepad1.left_bumper){
                 index=index-1;
             }
+*/
 
+ //15.5, 17, 27.89
 
-*/ //15.5, 17, 27.89
-
-            out1.setVelocity(gamepad2.left_stick_y* 3240);
+    /*        out1.setVelocity(gamepad2.left_stick_y* 3240);
             double velocity = out1.getVelocity();
             double error = 3240-out1.getVelocity();
             out.setVelocity(out1.getVelocity());
@@ -325,7 +325,7 @@ public class testTeleOp extends LinearOpMode {
             telemetry.addData("touch", intakeTouch.getValue());
             // P = 19.2, F = 21.2
 
-
+*/
 
 
 
@@ -431,9 +431,9 @@ public class testTeleOp extends LinearOpMode {
 
 
             moveRobot(drive, strafe, turn);
-            telemetry.addData("LINEAR", linear.getPosition());
+       //telemetry.addData("LINEAR", linear.getPosition());
             telemetry.addData("test", test);
-            telemetry.addData("out",out.getPower());
+         //telemetry.addData("out",out.getPower());
             //telemetry.update();
             sleep(10);
         }
