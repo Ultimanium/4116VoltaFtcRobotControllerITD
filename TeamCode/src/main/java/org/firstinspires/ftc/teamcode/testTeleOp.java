@@ -177,6 +177,7 @@ public class testTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            wheel.setPosition(0);
             targetFound = false;
             desiredTag  = null;
             //womp, womp.
@@ -251,7 +252,7 @@ public class testTeleOp extends LinearOpMode {
             }
 
      //       lift.setPosition(li);
-            telemetry.addData("li", lift.getPosition());
+     //       telemetry.addData("li", lift.getPosition());
 
          /*   if(gamepad1.x){
                 linear.setPosition(0.6);
@@ -380,7 +381,7 @@ public class testTeleOp extends LinearOpMode {
                 }
             }
 
-            if(test == 0){
+   /*         if(test == 0){
                 bcs.enableLed(true);
                 tcs.enableLed(false);
                 if(intakeTouch.isPressed() && bcs.alpha() > 1000){
@@ -389,7 +390,7 @@ public class testTeleOp extends LinearOpMode {
             } else {
                 bcs.enableLed(false);
                 tcs.enableLed(true);
-            }
+            }*/
 
             if(gamepad2.dpad_down && toggle){
                 toggle = false;
@@ -462,13 +463,13 @@ public class testTeleOp extends LinearOpMode {
         rightFrontDrive.setPower(rightFrontPower*sc);
         leftBackDrive.setPower(leftBackPower*sc);
         rightBackDrive.setPower(rightBackPower*sc);
-        telemetry.addData("Color sensor value blue", bcs.blue());
+      /*  telemetry.addData("Color sensor value blue", bcs.blue());
         telemetry.addData("Color sensor value red", bcs.red());
         telemetry.addData("Color sensor value green", bcs.green());
         telemetry.addData("Color sensor value alpha", bcs.alpha());
         telemetry.addData("Color sensor value fixed green", bcs.green() / bcs.alpha());
         telemetry.addData("Color sensor value fixed green", ((bcs.red() + bcs.blue()) / 2) / bcs.alpha());
-        telemetry.update();
+        telemetry.update();*/
     }
 
     //let there be a part two; electric boogaloo
