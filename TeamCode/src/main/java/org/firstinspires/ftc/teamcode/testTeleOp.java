@@ -161,10 +161,10 @@ public class testTeleOp extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
        // linear = hardwareMap.get(Servo.class, "li");
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
      /*   bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
@@ -177,7 +177,7 @@ public class testTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            wheel.setPosition(0);
+
             targetFound = false;
             desiredTag  = null;
             //womp, womp.
