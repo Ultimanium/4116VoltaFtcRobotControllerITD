@@ -163,8 +163,8 @@ public class testTeleOp extends LinearOpMode {
        // linear = hardwareMap.get(Servo.class, "li");
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
      /*   bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
@@ -177,6 +177,7 @@ public class testTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            kick.setPosition(0);
 
             targetFound = false;
             desiredTag  = null;
@@ -341,7 +342,7 @@ public class testTeleOp extends LinearOpMode {
             telemetry.addData("Power", power);
             if(gamepad2.left_bumper){
                 if(test<0.5){
-                    kick.setPosition(0.15);
+                    kick.setPosition(0);
                     sleep(250);
                 }
                 if(test>0.5){
@@ -349,7 +350,7 @@ public class testTeleOp extends LinearOpMode {
                     runtime.reset();
                 }
             }else{
-                kick.setPosition(0.15);
+                kick.setPosition(0);
                 if(runtime.seconds() > 0.25) {
                     if (gamepad2.x) {
                         wheel.setPosition(0);
@@ -374,7 +375,7 @@ public class testTeleOp extends LinearOpMode {
                         sleep(250);
                     }
                     if (gamepad2.b && gamepad2.right_bumper) {
-                        wheel.setPosition(0.908);
+                        wheel.setPosition(1.5);
                         test = 1;
                         sleep(250);
                     }
