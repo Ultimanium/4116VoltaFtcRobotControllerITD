@@ -73,8 +73,10 @@ public class VoltaSuperAuto extends LinearOpMode {
     double[] ballInputArray = {0,0.354,0.7272};
     long delay = 0;
 
-    double P = 19.2;
-    double F = 21.2;
+    public float P = 35f;
+    public float I = 0;
+    public float D = 0.1f;
+    public float F = 11.9f;
     double flywheelPower = 1400;
 
     public VoltacularOp.BALL[] Balls = {null,null,null};
@@ -266,9 +268,9 @@ public class VoltaSuperAuto extends LinearOpMode {
             drive.update();
             out1.setVelocity(flywheelPower);
             out.setVelocity(flywheelPower);
-            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+            PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
 
@@ -328,9 +330,9 @@ public class VoltaSuperAuto extends LinearOpMode {
             drive.update();
             out1.setVelocity(flywheelPower);
             out.setVelocity(flywheelPower);
-            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+            PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
 
@@ -368,18 +370,18 @@ public class VoltaSuperAuto extends LinearOpMode {
         kick.setPosition(0.15);
         out1.setVelocity(flywheelPower);
         out.setVelocity(flywheelPower);
-        PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+        PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
         out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-        PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+        PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
         out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         wheel.setPosition(ballArray[3 - balls]);
         runtime.reset();
         while(runtime.milliseconds() < 500){
             out1.setVelocity(flywheelPower);
             out.setVelocity(flywheelPower);
-            test2 = new PIDFCoefficients(P, 0, 0, F);
+            test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            test1 = new PIDFCoefficients(P, 0, 0, F);
+            test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
         kick.setPosition(0.6);
@@ -387,9 +389,9 @@ public class VoltaSuperAuto extends LinearOpMode {
         while(runtime.milliseconds() < 400){
             out1.setVelocity(flywheelPower);
             out.setVelocity(flywheelPower);
-            test2 = new PIDFCoefficients(P, 0, 0, F);
+            test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            test1 = new PIDFCoefficients(P, 0, 0, F);
+            test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
         kick.setPosition(0.15);
@@ -397,16 +399,16 @@ public class VoltaSuperAuto extends LinearOpMode {
         while(runtime.milliseconds() < 350){
             out1.setVelocity(flywheelPower);
             out.setVelocity(flywheelPower);
-            test2 = new PIDFCoefficients(P, 0, 0, F);
+            test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            test1 = new PIDFCoefficients(P, 0, 0, F);
+            test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
         out1.setVelocity(0);
         out.setVelocity(flywheelPower);
-        test2 = new PIDFCoefficients(P, 0, 0, F);
+        test2 = new PIDFCoefficients(P, I, D, F);
         out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-        test1 = new PIDFCoefficients(P, 0, 0, F);
+        test1 = new PIDFCoefficients(P, I, D, F);
         out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         balls--;
     }

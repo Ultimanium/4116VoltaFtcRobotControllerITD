@@ -80,8 +80,10 @@ public class VoltacularOp extends LinearOpMode {
     private Servo lift = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
-    double P = 15.5;
-    double F = 0;
+    public float P = 35f;
+    public float I = 0;
+    public float D = 0.1f;
+    public float F = 11.9f;
     double l = 0;
     double li = 0;
 
@@ -137,7 +139,9 @@ public class VoltacularOp extends LinearOpMode {
 
     public Boolean ShootToLoad = false;
 
-    public double outPower = 0;
+    public double outPower = 1500;
+
+    public int outToggle = 0;
 
     @Override
     public void runOpMode() {
@@ -275,18 +279,15 @@ public class VoltacularOp extends LinearOpMode {
             telemetry.addData("li", lift.getPosition());
 
             if(gamepad1.x){
+                outPower = 1250;
                 linear.setPosition(0.6);
-                P = 15.5;
-                F = 0;
             }
             if(gamepad1.y){
-                P = 17.25;
-                F = 0;
+                outPower = 1400;
                 linear.setPosition(0.525);
             }
             if(gamepad1.b){
-                P = 27.89;
-                F = 0;
+                outPower = 1900;
                 linear.setPosition(0.15);
             }
             if(gamepad2.dpad_up){
@@ -322,13 +323,13 @@ public class VoltacularOp extends LinearOpMode {
 
 */ //15.5, 17, 27.89
 
-            out1.setVelocity(outPower * 3240);
+            out1.setVelocity(outPower * outToggle);
             double velocity = out1.getVelocity();
-            double error = 3240-out1.getVelocity();
-            out.setVelocity(out1.getVelocity());
-            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+            double error = outPower-out1.getVelocity();
+            out.setVelocity(outPower * outToggle);
+            PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
             telemetry.addData("velocity", velocity);
             telemetry.addData("error", error);
@@ -448,7 +449,7 @@ public class VoltacularOp extends LinearOpMode {
                             }
                         }
                         if(foundBall){
-                            outPower = 1;
+                            outToggle = 1;
                             shootStage = 1;
                         } else {
                             BallQueue = new COLOR[] {null, null, null};
@@ -464,7 +465,7 @@ public class VoltacularOp extends LinearOpMode {
                     shootStage = 3;
                     lastIntake.reset();
                 } else if(shootStage == 3 && lastIntake.milliseconds() > 350){
-                    outPower = 0;
+                    outToggle = 0;
                     Balls[focusedBall] = null;
                     BallQueue[0] = BallQueue[1];
                     BallQueue[1] = BallQueue[2];
