@@ -353,7 +353,7 @@ public class testTeleOp extends LinearOpMode {
                 kick.setPosition(0);
                 if(runtime.seconds() > 0.25) {
                     if (gamepad2.x) {
-                        wheel.setPosition(0);
+                        wheel.setPosition(0.05);
                         test = 0;
                     }
                     if (gamepad2.y) {
@@ -375,7 +375,7 @@ public class testTeleOp extends LinearOpMode {
                         sleep(250);
                     }
                     if (gamepad2.b && gamepad2.right_bumper) {
-                        wheel.setPosition(1.5);
+                        wheel.setPosition(0.95);
                         test = 1;
                         sleep(250);
                     }
