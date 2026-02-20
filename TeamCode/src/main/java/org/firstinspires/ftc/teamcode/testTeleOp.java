@@ -356,20 +356,20 @@ public class testTeleOp extends LinearOpMode {
                         test = 0;
                     }
                     if (gamepad2.y) {
-                        wheel.setPosition(0.7272);
+                        wheel.setPosition(0.7672);
                         test = 0;
                     }
                     if (gamepad2.b) {
-                        wheel.setPosition(0.354);
+                        wheel.setPosition(0.41);
                         test = 0;
                     }
                     if (gamepad2.x && gamepad2.right_bumper) {
-                        wheel.setPosition(0.535);
+                        wheel.setPosition(0.595);
                         test = 1;
                         sleep(250);
                     }
                     if (gamepad2.y && gamepad2.right_bumper) {
-                        wheel.setPosition(0.162);
+                        wheel.setPosition(0.24);
                         test = 1;
                         sleep(250);
                     }
