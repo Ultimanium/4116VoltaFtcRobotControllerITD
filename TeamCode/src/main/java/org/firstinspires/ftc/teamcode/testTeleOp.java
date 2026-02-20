@@ -177,7 +177,6 @@ public class testTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            kick.setPosition(0);
 
             targetFound = false;
             desiredTag  = null;
