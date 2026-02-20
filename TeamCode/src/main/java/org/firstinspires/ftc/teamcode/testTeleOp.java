@@ -161,9 +161,9 @@ public class testTeleOp extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
        // linear = hardwareMap.get(Servo.class, "li");
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
      /*   bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
