@@ -79,7 +79,7 @@ public class testTeleOp extends LinearOpMode {
     double sc = 0;
     private ColorSensor bcs = null;
     private ColorSensor tcs = null;
-    private TouchSensor intakeTouch = null;
+ //   private TouchSensor intakeTouch = null;
     private Servo lift = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
@@ -185,7 +185,7 @@ public class testTeleOp extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
-        intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
+   //     intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
         laser = hardwareMap.get(DigitalChannel.class, "laser");
 
 
