@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -79,6 +80,7 @@ public class testTeleOp extends LinearOpMode {
     private ColorSensor tcs = null;
     private TouchSensor intakeTouch = null;
     private Servo lift = null;
+    private DigitalChannel laser = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
      double P = 0;
@@ -148,6 +150,8 @@ public class testTeleOp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
+        laser = hardwareMap.get(DigitalChannel.class, "laser");
+        laser.setMode(DigitalChannel.Mode.INPUT);
        /* out = hardwareMap.get(DcMotorEx.class, "lr");
         out1 = hardwareMap.get(DcMotorEx.class, "ll");
         out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -330,6 +334,8 @@ public class testTeleOp extends LinearOpMode {
 
 
 
+            telemetry.addData("laser", laser.getState());
+            telemetry.update();
 
 
 
