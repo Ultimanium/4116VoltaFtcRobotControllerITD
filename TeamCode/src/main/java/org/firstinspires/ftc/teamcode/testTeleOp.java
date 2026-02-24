@@ -57,8 +57,8 @@ public class testTeleOp extends LinearOpMode {
 
     // Nathaniel's play area end
 
-//    private DcMotorEx out = null;
-  //  private DcMotorEx out1 = null;
+    //    private DcMotorEx out = null;
+    //  private DcMotorEx out1 = null;
     // public Servo flap = null;
     public float power = 0;
     public boolean toggle = true;
@@ -71,7 +71,7 @@ public class testTeleOp extends LinearOpMode {
     private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
- //   private Servo linear = null;
+    //   private Servo linear = null;
     private ColorSensor cs = null;
     double  ws = 0;
     double test = 0;
@@ -79,7 +79,7 @@ public class testTeleOp extends LinearOpMode {
     double sc = 0;
     private ColorSensor bcs = null;
     private ColorSensor tcs = null;
- //   private TouchSensor intakeTouch = null;
+    //   private TouchSensor intakeTouch = null;
     private Servo lift = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
@@ -105,8 +105,8 @@ public class testTeleOp extends LinearOpMode {
 
         private COLOR ballColor;
 
-        public final double[] INPUTPOSITIONS = {0,0.35,0.7272};
-        public final double[] OUTPUTPOSITIONS = {0.515, 0.909, 0.142};
+        public final double[] INPUTPOSITIONS = {0.05,0.41,0.7672};
+        public final double[] OUTPUTPOSITIONS = {0.595, 0.95, 0.24};
 
         BALL(COLOR ballColor, int ballPos) {
             this.ballColor = ballColor;
@@ -178,14 +178,14 @@ public class testTeleOp extends LinearOpMode {
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
-      //  linear = hardwareMap.get(Servo.class, "li");
+        //  linear = hardwareMap.get(Servo.class, "li");
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
-   //     intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
+        //     intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
         laser = hardwareMap.get(DigitalChannel.class, "laser");
 
 
@@ -543,7 +543,7 @@ public class testTeleOp extends LinearOpMode {
             moveRobot(drive, strafe, turn);
             telemetry.addData("BallPastQueue", PastOutputs[0] + ", " + PastOutputs[1] + ", " + PastOutputs[2]);
             telemetry.addData("test", test);
-         //   telemetry.addData("out",out.getPower());
+            //   telemetry.addData("out",out.getPower());
             //telemetry.update();
             sleep(10);
         }
