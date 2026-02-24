@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -26,11 +25,11 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@TeleOp(name="OLD_TELEOP", group="Linear OpMode")
+@TeleOp(name="testTeleOp", group="Linear OpMode")
 
 public class testTeleOp extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime lastIntake = new ElapsedTime();
 
     // Nathaniel's play area
 
@@ -54,10 +53,12 @@ public class testTeleOp extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
 
+    private DigitalChannel laser = null;
+
     // Nathaniel's play area end
 
-    private DcMotorEx out = null;
-    private DcMotorEx out1 = null;
+//    private DcMotorEx out = null;
+  //  private DcMotorEx out1 = null;
     // public Servo flap = null;
     public float power = 0;
     public boolean toggle = true;
@@ -70,7 +71,7 @@ public class testTeleOp extends LinearOpMode {
     private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
-    private Servo linear = null;
+ //   private Servo linear = null;
     private ColorSensor cs = null;
     double  ws = 0;
     double test = 0;
@@ -80,59 +81,70 @@ public class testTeleOp extends LinearOpMode {
     private ColorSensor tcs = null;
     private TouchSensor intakeTouch = null;
     private Servo lift = null;
-    private DigitalChannel laser = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
-     double P = 0;
-     double F = 0;
-     double l = 0;
-     double li = 0;
+    public float P = 35f;
+    public float I = 0;
+    public float D = 0.1f;
+    public float F = 11.9f;
+    double l = 0;
+    double li = 0;
+
+    public int[] PastOutputs = {0, 1, 2};
 
     public enum COLOR {
         GREEN,
-        PURPLE
+        PURPLE,
+        ANTINULL
     }
     public enum BALL {
 
-        GREEN01(COLOR.GREEN, 1),
-        GREEN02(COLOR.GREEN, 2),
-        GREEN03(COLOR.GREEN, 3),
-        PURPLE01(COLOR.PURPLE, 1),
-        PURPLE02(COLOR.PURPLE, 2),
-        PURPLE03(COLOR.PURPLE, 3);
+        GREEN(COLOR.GREEN, 0),
+        PURPLE(COLOR.PURPLE, 0),
+        ANTINULL(COLOR.ANTINULL, 0);
 
         private COLOR ballColor;
 
-        private int ballPos;
-
-        public final double[] INPUTPOSITIONS = {0,0.354,0.7272};
-        public final double[] OUTPUTPOSITIONS = {0.565, 0.909, 0.192};
+        public final double[] INPUTPOSITIONS = {0,0.35,0.7272};
+        public final double[] OUTPUTPOSITIONS = {0.515, 0.909, 0.142};
 
         BALL(COLOR ballColor, int ballPos) {
             this.ballColor = ballColor;
-            this.ballPos = ballPos;
         }
 
         public COLOR getColor() {
             return ballColor;
         }
 
-        public int getBallPos() {
-            return ballPos;
-        }
-
-        public double getBallInput() {
-            return INPUTPOSITIONS[ballPos];
-        }
-
-        public double getBallOutput() {
-            return OUTPUTPOSITIONS[ballPos];
+        public COLOR getInverseColor() {
+            if(ballColor == COLOR.GREEN){
+                return COLOR.PURPLE;
+            } else if(ballColor == COLOR.PURPLE){
+                return COLOR.GREEN;
+            } else {
+                return COLOR.ANTINULL;
+            }
         }
     }
     public BALL[] Balls = {null,null,null};
 
-    private BALL ProtoBall = BALL.GREEN01;
+    private BALL ProtoBall = BALL.GREEN;
 
+    public int focusedBall = 0;
+
+    public COLOR[] BallQueue = {null, null, null};
+
+    public static COLOR[] colorSequence;
+
+    public COLOR[] colorSequenceOnInit;
+
+    public int shootStage = 0;
+
+    public Boolean ShootToLoad = false;
+
+    public double outPower = 1500;
+
+    public int outToggle = 0;
 
     @Override
     public void runOpMode() {
@@ -150,38 +162,51 @@ public class testTeleOp extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
-        laser = hardwareMap.get(DigitalChannel.class, "laser");
-        laser.setMode(DigitalChannel.Mode.INPUT);
-       /* out = hardwareMap.get(DcMotorEx.class, "lr");
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+  /*      out = hardwareMap.get(DcMotorEx.class, "lr");
         out1 = hardwareMap.get(DcMotorEx.class, "ll");
         out.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         out1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         out.setDirection(DcMotorSimple.Direction.FORWARD);
-        out1.setDirection(DcMotorSimple.Direction.REVERSE); */
-
+        out1.setDirection(DcMotorSimple.Direction.REVERSE);
+*/
         // flap = hardwareMap.get(Servo.class, "door");
-      //  lift = hardwareMap.get(Servo.class, "up");
+        lift = hardwareMap.get(Servo.class, "up");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
-       // linear = hardwareMap.get(Servo.class, "li");
+      //  linear = hardwareMap.get(Servo.class, "li");
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-     /*   bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
+        bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
-        */
+        laser = hardwareMap.get(DigitalChannel.class, "laser");
+
+
+
+
 
 
         //ashbaby
         if (USE_WEBCAM)
-            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(1200, 5000);  // Use low exposure time to reduce motion blur
+
+        if(colorSequence != null){
+            colorSequenceOnInit = colorSequence;
+        } else {
+            colorSequenceOnInit = new COLOR[]{COLOR.PURPLE, COLOR.PURPLE, COLOR.GREEN};
+        }
 
         waitForStart();
+        wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
+        lastIntake.reset();
         while (opModeIsActive()) {
-
             targetFound = false;
             desiredTag  = null;
             //womp, womp.
@@ -251,26 +276,25 @@ public class testTeleOp extends LinearOpMode {
                 turn   = -gamepad1.right_stick_x/2;
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
-            if(gamepad2.left_bumper && gamepad2.right_bumper){
+            if(gamepad2.right_bumper && gamepad2.a){
                 li = 1;
+            } else {
+                li = 0;
             }
 
-     //       lift.setPosition(li);
-     //       telemetry.addData("li", lift.getPosition());
+            lift.setPosition(li);
+            telemetry.addData("li", lift.getPosition());
 
-         /*   if(gamepad1.x){
+   /*         if(gamepad1.x){
+                outPower = 1250;
                 linear.setPosition(0.6);
-                P = 15.5;
-                F = 0;
             }
             if(gamepad1.y){
-                P = 17.25;
-                F = 0;
+                outPower = 1400;
                 linear.setPosition(0.525);
             }
             if(gamepad1.b){
-                P = 27.89;
-                F = 0;
+                outPower = 1900;
                 linear.setPosition(0.15);
             }
             if(gamepad2.dpad_up){
@@ -278,15 +302,7 @@ public class testTeleOp extends LinearOpMode {
             }
             if(gamepad2.dpad_down){
                 l=l-0.05;
-            }
-
-            if(test > 0.5){
-                intake.setPower(0);
-            }
-
-            if(test < 0.5){
-                intake.setPower(gamepad2.right_stick_y);
-            }
+            }  */
        /*     if(index<1){
                 index = 5;
             }
@@ -310,44 +326,36 @@ public class testTeleOp extends LinearOpMode {
             if(gamepad1.left_bumper){
                 index=index-1;
             }
-*/
 
- //15.5, 17, 27.89
 
-    /*        out1.setVelocity(gamepad2.left_stick_y* 3240);
+*/ //15.5, 17, 27.89
+
+
+   /*         out1.setVelocity(outPower * outToggle);
             double velocity = out1.getVelocity();
-            double error = 3240-out1.getVelocity();
-            out.setVelocity(out1.getVelocity());
-            PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+            double error = outPower-out1.getVelocity();
+            out.setVelocity(outPower * outToggle);
+            PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+            PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
-            telemetry.addData("velocity", velocity);
+            telemetry.addData("velocity", velocity);-
             telemetry.addData("error", error);
             telemetry.addData("index", index);
             telemetry.addData("P", P);
             telemetry.addData("F", F);
-            telemetry.addData("touch", intakeTouch.getValue());
+            telemetry.addData("touch", intakeTouch.getValue());   */
             // P = 19.2, F = 21.2
-
-*/
-
-
-
-            telemetry.addData("laser", laser.getState());
-            telemetry.update();
-
-
-
             if(gamepad1.a){
                 ws=-0.15;
             }else if (gamepad1.b){
                 ws = 0;
             }
             telemetry.addData("Power", power);
+            /*
             if(gamepad2.left_bumper){
                 if(test<0.5){
-                    kick.setPosition(0);
+                    kick.setPosition(0.15);
                     sleep(250);
                 }
                 if(test>0.5){
@@ -355,48 +363,143 @@ public class testTeleOp extends LinearOpMode {
                     runtime.reset();
                 }
             }else{
-                kick.setPosition(0);
+                kick.setPosition(0.15);
                 if(runtime.seconds() > 0.25) {
                     if (gamepad2.x) {
-                        wheel.setPosition(0.05);
+                        wheel.setPosition(0);
                         test = 0;
                     }
                     if (gamepad2.y) {
-                        wheel.setPosition(0.7672);
+                        wheel.setPosition(0.7272);
                         test = 0;
                     }
                     if (gamepad2.b) {
-                        wheel.setPosition(0.41);
+                        wheel.setPosition(0.354);
                         test = 0;
                     }
                     if (gamepad2.x && gamepad2.right_bumper) {
-                        wheel.setPosition(0.595);
+                        wheel.setPosition(0.535);
                         test = 1;
                         sleep(250);
                     }
                     if (gamepad2.y && gamepad2.right_bumper) {
-                        wheel.setPosition(0.24);
+                        wheel.setPosition(0.162);
                         test = 1;
                         sleep(250);
                     }
                     if (gamepad2.b && gamepad2.right_bumper) {
-                        wheel.setPosition(0.95);
+                        wheel.setPosition(0.908);
                         test = 1;
                         sleep(250);
                     }
                 }
             }
 
-   /*         if(test == 0){
+             */
+            telemetry.addData("TestInput", false);
+
+            if(gamepad2.left_bumper && (Balls[0] == null || Balls[1] == null || Balls[2] == null) && shootStage == 0) {
+                BallQueue = new COLOR[] {null, null, null};
+                telemetry.addData("TestInput", true);
                 bcs.enableLed(true);
                 tcs.enableLed(false);
-                if(intakeTouch.isPressed() && bcs.alpha() > 1000){
-
+                intake.setPower(1);
+                wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
+                if(!ShootToLoad || lastIntake.milliseconds() > 1250){
+                    ShootToLoad = false;
+                    if (bcs.alpha() > 250 && lastIntake.milliseconds() > 600) {
+                        telemetry.addData("FinalInput", true);
+                        lastIntake.reset();
+                        if ((bcs.red() + bcs.blue()) / 2.0 > bcs.green()) {
+                            Balls[focusedBall] = BALL.PURPLE;
+                        } else {
+                            Balls[focusedBall] = BALL.GREEN;
+                        }
+                        for (int i = 0; i < Balls.length; i++) {
+                            if (Balls[i] == null) {
+                                focusedBall = i;
+                                break;
+                            }
+                        }
+                    }
                 }
             } else {
+                if(shootStage == 0){
+                    if(BallQueue[0] == null && BallQueue[1] == null && BallQueue[2] == null) {
+                        if (gamepad2.y) {
+                            BallQueue = new COLOR[]{COLOR.GREEN, null, null};
+                        } else if (gamepad2.x) {
+                            BallQueue = new COLOR[]{COLOR.PURPLE, null, null};
+                        } else if (gamepad2.b) {
+                            BallQueue[0] = colorSequenceOnInit[0];
+                            BallQueue[1] = colorSequenceOnInit[1];
+                            BallQueue[2] = colorSequenceOnInit[2];
+                        } else if (gamepad2.a) {
+                            Balls[PastOutputs[2]] = BALL.ANTINULL;
+                            BallQueue = new COLOR[]{COLOR.ANTINULL, null, null};
+                        }
+                    } else if(BallQueue[0] != null){
+                        boolean foundBall = false;
+                        for (int i = 0; i < Balls.length; i++) {
+                            if (Balls[i] != null && Balls[i].getColor() == BallQueue[0]) {
+                                focusedBall = i;
+                                foundBall = true;
+                                break;
+                            }
+                        }
+                        if(!foundBall){
+                            for (int i = 0; i < Balls.length; i++) {
+                                if (Balls[i] != null) {
+                                    focusedBall = i;
+                                    foundBall = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if(foundBall){
+                            outToggle = 1;
+                            shootStage = 1;
+                        } else {
+                            BallQueue = new COLOR[] {null, null, null};
+                        }
+                    }
+                    lastIntake.reset();
+                } else if(shootStage == 1 && lastIntake.milliseconds() > 500){
+                    kick.setPosition(0.6);
+                    shootStage = 2;
+                    lastIntake.reset();
+                } else if(shootStage == 2 && lastIntake.milliseconds() > 400){
+                    kick.setPosition(0.15);
+                    shootStage = 3;
+                    lastIntake.reset();
+                } else if(shootStage == 3 && lastIntake.milliseconds() > 350){
+                    outToggle = 0;
+                    Balls[focusedBall] = null;
+                    BallQueue[0] = BallQueue[1];
+                    BallQueue[1] = BallQueue[2];
+                    BallQueue[2] = null;
+                    shootStage = 0;
+                    int tempCount = 0;
+                    int[] temp = {focusedBall, 0, 0};
+                    for(int i = 0; i < PastOutputs.length; i++){
+                        if(PastOutputs[i] != focusedBall){
+                            tempCount++;
+                            temp[tempCount] = PastOutputs[i];
+                        }
+                    }
+                    PastOutputs[0] = temp[0];
+                    PastOutputs[1] = temp[1];
+                    PastOutputs[2] = temp[2];
+                    lastIntake.reset();
+                }
+
+
+                ShootToLoad = true;
+                intake.setPower(0);
+                wheel.setPosition(ProtoBall.OUTPUTPOSITIONS[focusedBall]);
                 bcs.enableLed(false);
                 tcs.enableLed(true);
-            }*/
+            }
 
             if(gamepad2.dpad_down && toggle){
                 toggle = false;
@@ -438,9 +541,9 @@ public class testTeleOp extends LinearOpMode {
 
 
             moveRobot(drive, strafe, turn);
-       //telemetry.addData("LINEAR", linear.getPosition());
+            telemetry.addData("BallPastQueue", PastOutputs[0] + ", " + PastOutputs[1] + ", " + PastOutputs[2]);
             telemetry.addData("test", test);
-         //telemetry.addData("out",out.getPower());
+         //   telemetry.addData("out",out.getPower());
             //telemetry.update();
             sleep(10);
         }
@@ -469,13 +572,19 @@ public class testTeleOp extends LinearOpMode {
         rightFrontDrive.setPower(rightFrontPower*sc);
         leftBackDrive.setPower(leftBackPower*sc);
         rightBackDrive.setPower(rightBackPower*sc);
-      /*  telemetry.addData("Color sensor value blue", bcs.blue());
-        telemetry.addData("Color sensor value red", bcs.red());
-        telemetry.addData("Color sensor value green", bcs.green());
-        telemetry.addData("Color sensor value alpha", bcs.alpha());
-        telemetry.addData("Color sensor value fixed green", bcs.green() / bcs.alpha());
-        telemetry.addData("Color sensor value fixed green", ((bcs.red() + bcs.blue()) / 2) / bcs.alpha());
-        telemetry.update();*/
+        telemetry.addData("LastIntake", lastIntake.milliseconds());
+        telemetry.addData("ShootStage", shootStage);
+        telemetry.addData("BallQueue", BallQueue[0] + ", "+ BallQueue[1] + ", "+ BallQueue[2]);
+        telemetry.addData("StoredSequence", colorSequenceOnInit[0] + ", "+ colorSequenceOnInit[1] + ", "+ colorSequenceOnInit[2]);
+        if(Balls[0] != null)
+            telemetry.addData("1", Balls[0].getColor());
+        if(Balls[1] != null)
+            telemetry.addData("2", Balls[1].getColor());
+        if(Balls[2] != null)
+            telemetry.addData("3", Balls[2].getColor());
+        telemetry.addData("Color sensor value fixed green", bcs.green() / ((double)bcs.alpha()));
+        telemetry.addData("Color sensor value fixed green", ((bcs.red() + bcs.blue()) / 2.0) / ((double)bcs.alpha()));
+        telemetry.update();
     }
 
     //let there be a part two; electric boogaloo
