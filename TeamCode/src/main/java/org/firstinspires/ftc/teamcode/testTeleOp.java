@@ -407,7 +407,7 @@ public class testTeleOp extends LinearOpMode {
                 wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
                 if(!ShootToLoad || lastIntake.milliseconds() > 1250){
                     ShootToLoad = false;
-                    if (bcs.alpha() > 250 && lastIntake.milliseconds() > 600) {
+                    if (laser.getState() && lastIntake.milliseconds() > 600) {
                         telemetry.addData("FinalInput", true);
                         lastIntake.reset();
                         if ((bcs.red() + bcs.blue()) / 2.0 > bcs.green()) {
