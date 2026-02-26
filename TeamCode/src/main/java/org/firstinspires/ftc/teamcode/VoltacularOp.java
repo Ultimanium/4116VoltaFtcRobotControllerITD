@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -102,8 +103,8 @@ public class VoltacularOp extends LinearOpMode {
 
         private COLOR ballColor;
 
-        public final double[] INPUTPOSITIONS = {0,0.354,0.7272};
-        public final double[] OUTPUTPOSITIONS = {0.565, 0.909, 0.192};
+        public final double[] INPUTPOSITIONS = {0,0.35,0.7272};
+        public final double[] OUTPUTPOSITIONS = {0.515, 0.909, 0.142};
 
         BALL(COLOR ballColor, int ballPos) {
             this.ballColor = ballColor;
@@ -183,6 +184,8 @@ public class VoltacularOp extends LinearOpMode {
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
         tcs = hardwareMap.get(ColorSensor.class, "topColor");
         intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
+
+
 
 
 
@@ -322,6 +325,7 @@ public class VoltacularOp extends LinearOpMode {
 
 
 */ //15.5, 17, 27.89
+
 
             out1.setVelocity(outPower * outToggle);
             double velocity = out1.getVelocity();

@@ -118,7 +118,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         initVars();
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
-        ballArray = new double[]{0.565, 0.192, 0.938};
+        ballArray = new double[]{0.515, 0.142, 0.938};
         wheel.setPosition(0.35);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
