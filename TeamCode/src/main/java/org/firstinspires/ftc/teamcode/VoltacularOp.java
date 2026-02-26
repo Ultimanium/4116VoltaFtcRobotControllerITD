@@ -286,7 +286,7 @@ public class VoltacularOp extends LinearOpMode {
                 linear.setPosition(0.525);
             }
             if(gamepad1.b){
-                outPower = 1800;
+                outPower = 1650;
                 linear.setPosition(0.15);
             }
             if(gamepad2.dpad_up){
