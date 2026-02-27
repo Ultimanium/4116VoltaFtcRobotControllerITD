@@ -71,12 +71,14 @@ public class VoltacularOp extends LinearOpMode {
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
     private Servo linear = null;
     private ColorSensor cs = null;
-    private DigitalChannel laser = null;
     double  ws = 0;
     double test = 0;
     double s = 0;
     double sc = 0;
     private ColorSensor bcs = null;
+    private ColorSensor tcs = null;
+    private TouchSensor intakeTouch = null;
+    private Servo lift = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
     public float P = 35f;
@@ -101,8 +103,8 @@ public class VoltacularOp extends LinearOpMode {
 
         private COLOR ballColor;
 
-        public final double[] INPUTPOSITIONS = {0.05,0.41,0.7672};
-        public final double[] OUTPUTPOSITIONS = {0.595, 0.95, 0.24};
+        public final double[] INPUTPOSITIONS = {0,0.35,0.7272};
+        public final double[] OUTPUTPOSITIONS = {0.515, 0.909, 0.142};
 
         BALL(COLOR ballColor, int ballPos) {
             this.ballColor = ballColor;
@@ -169,9 +171,8 @@ public class VoltacularOp extends LinearOpMode {
         out.setDirection(DcMotorSimple.Direction.FORWARD);
         out1.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        laser = hardwareMap.get(DigitalChannel.class, "laser");
-
         // flap = hardwareMap.get(Servo.class, "door");
+        lift = hardwareMap.get(Servo.class, "up");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
@@ -180,8 +181,9 @@ public class VoltacularOp extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        intake.setDirection(DcMotor.Direction.REVERSE);
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
+        tcs = hardwareMap.get(ColorSensor.class, "topColor");
+        intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
 
 
 
@@ -198,7 +200,6 @@ public class VoltacularOp extends LinearOpMode {
         }
 
         waitForStart();
-        kick.setPosition(0.6);
         wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
         lastIntake.reset();
         while (opModeIsActive()) {
@@ -277,6 +278,9 @@ public class VoltacularOp extends LinearOpMode {
                 li = 0;
             }
 
+            lift.setPosition(li);
+            telemetry.addData("li", lift.getPosition());
+
             if(gamepad1.x){
                 outPower = 1250;
                 linear.setPosition(0.6);
@@ -286,7 +290,7 @@ public class VoltacularOp extends LinearOpMode {
                 linear.setPosition(0.525);
             }
             if(gamepad1.b){
-                outPower = 1650;
+                outPower = 1900;
                 linear.setPosition(0.15);
             }
             if(gamepad2.dpad_up){
@@ -336,6 +340,7 @@ public class VoltacularOp extends LinearOpMode {
             telemetry.addData("index", index);
             telemetry.addData("P", P);
             telemetry.addData("F", F);
+            telemetry.addData("touch", intakeTouch.getValue());
             // P = 19.2, F = 21.2
             if(gamepad1.a){
                 ws=-0.15;
@@ -393,11 +398,12 @@ public class VoltacularOp extends LinearOpMode {
                 BallQueue = new COLOR[] {null, null, null};
                 telemetry.addData("TestInput", true);
                 bcs.enableLed(true);
+                tcs.enableLed(false);
                 intake.setPower(1);
                 wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
                 if(!ShootToLoad || lastIntake.milliseconds() > 1250){
                     ShootToLoad = false;
-                    if (laser.getState() && lastIntake.milliseconds() > 600) {
+                    if (bcs.alpha() > 250 && lastIntake.milliseconds() > 600) {
                         telemetry.addData("FinalInput", true);
                         lastIntake.reset();
                         if ((bcs.red() + bcs.blue()) / 2.0 > bcs.green()) {
@@ -455,11 +461,11 @@ public class VoltacularOp extends LinearOpMode {
                     }
                     lastIntake.reset();
                 } else if(shootStage == 1 && lastIntake.milliseconds() > 500){
-                    kick.setPosition(0.15);
+                    kick.setPosition(0.6);
                     shootStage = 2;
                     lastIntake.reset();
                 } else if(shootStage == 2 && lastIntake.milliseconds() > 400){
-                    kick.setPosition(0.6);
+                    kick.setPosition(0.15);
                     shootStage = 3;
                     lastIntake.reset();
                 } else if(shootStage == 3 && lastIntake.milliseconds() > 350){
@@ -488,6 +494,7 @@ public class VoltacularOp extends LinearOpMode {
                 intake.setPower(0);
                 wheel.setPosition(ProtoBall.OUTPUTPOSITIONS[focusedBall]);
                 bcs.enableLed(false);
+                tcs.enableLed(true);
             }
 
             if(gamepad2.dpad_down && toggle){
