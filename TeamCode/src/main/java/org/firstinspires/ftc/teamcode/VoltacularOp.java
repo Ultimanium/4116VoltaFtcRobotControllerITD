@@ -72,6 +72,8 @@ public class VoltacularOp extends LinearOpMode {
     private Servo linear = null;
     private ColorSensor cs = null;
     private DigitalChannel laser = null;
+    private Servo light1 = null;
+
     double  ws = 0;
     double test = 0;
     double s = 0;
@@ -142,6 +144,7 @@ public class VoltacularOp extends LinearOpMode {
 
     public int outToggle = 0;
 
+    public int count = 0;
     @Override
     public void runOpMode() {
 
@@ -182,6 +185,7 @@ public class VoltacularOp extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         intake.setDirection(DcMotor.Direction.REVERSE);
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
+        light1 = hardwareMap.get(Servo.class, "Lrgb");
 
 
 
@@ -286,7 +290,7 @@ public class VoltacularOp extends LinearOpMode {
                 linear.setPosition(0.525);
             }
             if(gamepad1.b){
-                outPower = 1800;
+                outPower = 1650;
                 linear.setPosition(0.15);
             }
             if(gamepad2.dpad_up){
@@ -295,6 +299,7 @@ public class VoltacularOp extends LinearOpMode {
             if(gamepad2.dpad_down){
                 l=l-0.05;
             }
+
        /*     if(index<1){
                 index = 5;
             }
@@ -321,7 +326,24 @@ public class VoltacularOp extends LinearOpMode {
 
 
 */ //15.5, 17, 27.89
-
+            if(Balls == null){
+                light1.setPosition(0);
+            } else{
+                int c = 0;
+                for (Object element : Balls) {
+                    if (element != null) {
+                        c++;
+                        count = c;
+                    }
+                }
+            }
+            if(count == 1){
+            light1.setPosition(0.277);
+            }else if(count == 2){
+                light1.setPosition(0.388);
+            }else if(count == 3){
+                light1.setPosition(0.444);
+            }
 
             out1.setVelocity(outPower * outToggle);
             double velocity = out1.getVelocity();
@@ -389,6 +411,7 @@ public class VoltacularOp extends LinearOpMode {
              */
             telemetry.addData("TestInput", false);
 
+
             if(gamepad2.left_bumper && (Balls[0] == null || Balls[1] == null || Balls[2] == null) && shootStage == 0) {
                 BallQueue = new COLOR[] {null, null, null};
                 telemetry.addData("TestInput", true);
@@ -446,9 +469,12 @@ public class VoltacularOp extends LinearOpMode {
                                 }
                             }
                         }
+
+
                         if(foundBall){
                             outToggle = 1;
                             shootStage = 1;
+
                         } else {
                             BallQueue = new COLOR[] {null, null, null};
                         }
@@ -533,6 +559,9 @@ public class VoltacularOp extends LinearOpMode {
             telemetry.addData("BallPastQueue", PastOutputs[0] + ", " + PastOutputs[1] + ", " + PastOutputs[2]);
             telemetry.addData("test", test);
             telemetry.addData("out",out.getPower());
+            telemetry.addData("kick",kick.getPosition());
+            telemetry.update();
+
             //telemetry.update();
             sleep(10);
         }
