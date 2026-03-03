@@ -78,7 +78,9 @@ public class testTeleOp extends LinearOpMode {
     double s = 0;
     double sc = 0;
     private ColorSensor bcs = null;
+    private ColorSensor tcs = null;
     //   private TouchSensor intakeTouch = null;
+    private Servo lift = null;
     double[] size = {10, 1, 0.1, 0.01, 0.001};
     int index = 1;
     public float P = 35f;
@@ -172,6 +174,7 @@ public class testTeleOp extends LinearOpMode {
         out1.setDirection(DcMotorSimple.Direction.REVERSE);
 */
         // flap = hardwareMap.get(Servo.class, "door");
+        lift = hardwareMap.get(Servo.class, "up");
         intake = hardwareMap.get(DcMotor.class, "i");
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
@@ -182,6 +185,7 @@ public class testTeleOp extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         intake.setDirection(DcMotor.Direction.REVERSE);
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
+        tcs = hardwareMap.get(ColorSensor.class, "topColor");
         //     intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
         laser = hardwareMap.get(DigitalChannel.class, "laser");
 
@@ -279,6 +283,8 @@ public class testTeleOp extends LinearOpMode {
                 li = 0;
             }
 
+            lift.setPosition(li);
+            telemetry.addData("li", lift.getPosition());
 
    /*         if(gamepad1.x){
                 outPower = 1250;
@@ -397,6 +403,7 @@ public class testTeleOp extends LinearOpMode {
                 BallQueue = new COLOR[] {null, null, null};
                 telemetry.addData("TestInput", true);
                 bcs.enableLed(true);
+                tcs.enableLed(false);
                 intake.setPower(1);
                 wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
                 if(!ShootToLoad || lastIntake.milliseconds() > 1250){
@@ -459,11 +466,11 @@ public class testTeleOp extends LinearOpMode {
                     }
                     lastIntake.reset();
                 } else if(shootStage == 1 && lastIntake.milliseconds() > 500){
-                    kick.setPosition(0.15);
+                    kick.setPosition(0.6);
                     shootStage = 2;
                     lastIntake.reset();
                 } else if(shootStage == 2 && lastIntake.milliseconds() > 400){
-                    kick.setPosition(0.6);
+                    kick.setPosition(0.15);
                     shootStage = 3;
                     lastIntake.reset();
                 } else if(shootStage == 3 && lastIntake.milliseconds() > 350){
@@ -492,6 +499,7 @@ public class testTeleOp extends LinearOpMode {
                 intake.setPower(0);
                 wheel.setPosition(ProtoBall.OUTPUTPOSITIONS[focusedBall]);
                 bcs.enableLed(false);
+                tcs.enableLed(true);
             }
 
             if(gamepad2.dpad_down && toggle){
