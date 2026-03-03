@@ -145,6 +145,7 @@ public class VoltacularOp extends LinearOpMode {
     public int outToggle = 0;
 
     public int count = 0;
+
     @Override
     public void runOpMode() {
 
@@ -326,9 +327,7 @@ public class VoltacularOp extends LinearOpMode {
 
 
 */ //15.5, 17, 27.89
-            if(Balls == null){
-                light1.setPosition(0);
-            } else{
+             else{
                 int c = 0;
                 for (Object element : Balls) {
                     if (element != null) {
@@ -337,12 +336,14 @@ public class VoltacularOp extends LinearOpMode {
                     }
                 }
             }
-            if(count == 1){
-            light1.setPosition(0.277);
+            if(Balls == null){
+                light1.setPosition(0);
+            }else if(count == 1){
+            light1.setPosition(0.3);
             }else if(count == 2){
-                light1.setPosition(0.388);
+                light1.setPosition(0.5);
             }else if(count == 3){
-                light1.setPosition(0.444);
+                light1.setPosition(0.65);
             }
 
             out1.setVelocity(outPower * outToggle);
