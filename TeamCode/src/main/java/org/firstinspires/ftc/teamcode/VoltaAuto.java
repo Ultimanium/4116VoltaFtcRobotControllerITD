@@ -343,7 +343,7 @@ public class VoltaAuto extends LinearOpMode {
                     telemetry.addData("LAUNCHING BALL NUM",3 - balls);
                     telemetry.update();
                     linear.setPosition(0.6);
-                    kick.setPosition(0.15);
+                    kick.setPosition(0.6);
                     out1.setVelocity(3240);
                     out.setVelocity(out1.getVelocity());
                     PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
@@ -361,7 +361,7 @@ public class VoltaAuto extends LinearOpMode {
                         test1 = new PIDFCoefficients(P, 0, 0, F);
                         out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     }
-                    kick.setPosition(0.6);
+                    kick.setPosition(0.15);
                     runtime.reset();
                     while(runtime.milliseconds() < 400){
                         out1.setVelocity(3240);
@@ -371,7 +371,7 @@ public class VoltaAuto extends LinearOpMode {
                         test1 = new PIDFCoefficients(P, 0, 0, F);
                         out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     }
-                    kick.setPosition(0.15);
+                    kick.setPosition(0.6);
                     runtime.reset();
                     while(runtime.milliseconds() < 350){
                         out1.setVelocity(3240);

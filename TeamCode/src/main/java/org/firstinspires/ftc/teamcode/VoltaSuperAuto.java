@@ -77,7 +77,7 @@ public class VoltaSuperAuto extends LinearOpMode {
     public float I = 0;
     public float D = 0.1f;
     public float F = 11.9f;
-    double flywheelPower = 1400;
+    double flywheelPower = 1650;
 
     public VoltacularOp.BALL[] Balls = {null,null,null};
 
@@ -367,7 +367,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         telemetry.addData("LAUNCHING BALL NUM",3 - balls);
         telemetry.update();
         linear.setPosition(0.15);
-        kick.setPosition(0.15);
+        kick.setPosition(0.6);
         out1.setVelocity(flywheelPower);
         out.setVelocity(flywheelPower);
         PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
@@ -384,7 +384,7 @@ public class VoltaSuperAuto extends LinearOpMode {
             test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
-        kick.setPosition(0.6);
+        kick.setPosition(0.15);
         runtime.reset();
         while(runtime.milliseconds() < 400){
             out1.setVelocity(flywheelPower);
@@ -394,7 +394,7 @@ public class VoltaSuperAuto extends LinearOpMode {
             test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
-        kick.setPosition(0.15);
+        kick.setPosition(0.6);
         runtime.reset();
         while(runtime.milliseconds() < 350){
             out1.setVelocity(flywheelPower);
