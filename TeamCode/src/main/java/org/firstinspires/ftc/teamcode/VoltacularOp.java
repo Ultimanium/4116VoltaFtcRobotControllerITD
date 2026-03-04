@@ -104,7 +104,7 @@ public class VoltacularOp extends LinearOpMode {
         private COLOR ballColor;
 
         public final double[] INPUTPOSITIONS = {0.05,0.41,0.7672};
-        public final double[] OUTPUTPOSITIONS = {0.595, 0.95, 0.24};
+        public final double[] OUTPUTPOSITIONS = {0.595, 0.95, 0.23};
 
         BALL(COLOR ballColor, int ballPos) {
             this.ballColor = ballColor;
@@ -481,15 +481,15 @@ public class VoltacularOp extends LinearOpMode {
                         }
                     }
                     lastIntake.reset();
-                } else if(shootStage == 1 && lastIntake.milliseconds() > 500){
+                } else if(shootStage == 1 && lastIntake.milliseconds() > 400){
                     kick.setPosition(0.15);
                     shootStage = 2;
                     lastIntake.reset();
-                } else if(shootStage == 2 && lastIntake.milliseconds() > 400){
+                } else if(shootStage == 2 && lastIntake.milliseconds() > 250){
                     kick.setPosition(0.6);
                     shootStage = 3;
                     lastIntake.reset();
-                } else if(shootStage == 3 && lastIntake.milliseconds() > 350){
+                } else if(shootStage == 3 && lastIntake.milliseconds() > 250){
                     outToggle = 0;
                     Balls[focusedBall] = null;
                     BallQueue[0] = BallQueue[1];

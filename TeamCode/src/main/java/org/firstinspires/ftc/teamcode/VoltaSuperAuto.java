@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -68,9 +69,11 @@ public class VoltaSuperAuto extends LinearOpMode {
     private Servo linear = null;
     private ColorSensor bcs = null;
 
+    private DigitalChannel laser = null;
+
     int balls = 3;
     double[] ballArray = {-1,-1,-1};
-    double[] ballInputArray = {0,0.354,0.7272};
+    double[] ballInputArray = {0.05,0.41,0.7672};
     long delay = 0;
 
     public float P = 35f;
@@ -118,7 +121,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         initVars();
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
-        ballArray = new double[]{0.565, 0.192, 0.938};
+        ballArray = new double[]{0.595, 0.23, 0.95};
         wheel.setPosition(0.35);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -131,7 +134,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         if(currentTeam == TEAM.BLUE){
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, 25, 0);
-            shootPosition = new Pose2d(8, 0, Math.toRadians(22));
+            shootPosition = new Pose2d(8, 0, Math.toRadians(20));
             shootPositionSecond = new Pose2d(8, -3, Math.toRadians(22));
             inputStart = new Pose2d(28, 5, -Math.toRadians(90));
             inputs = new Pose2d[] {new Pose2d(28, 16.5, -Math.toRadians(90)), new Pose2d(28, 21, -Math.toRadians(90)), new Pose2d(28, 27, -Math.toRadians(90))};
@@ -175,7 +178,7 @@ public class VoltaSuperAuto extends LinearOpMode {
 
         waitForStart();
         linear.setPosition(0.15);
-
+        kick.setPosition(0.6);
 
         targetFound = false;
         desiredTag = null;
@@ -187,17 +190,17 @@ public class VoltaSuperAuto extends LinearOpMode {
                 // Do we want ts?
                  if (detection.id == 21){
                     // GPP
-                    ballArray = new double[]{0.565, 0.192, 0.938};
+                     ballArray = new double[]{0.595, 0.23, 0.95};
                      BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE};
                      VoltacularOp.colorSequence = BallSequence;
                 } else if (detection.id == 22){
                     // PGP
-                    ballArray = new double[]{0.192, 0.565, 0.938};
+                     ballArray = new double[]{0.23, 0.595, 0.95};
                      BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE};
                      VoltacularOp.colorSequence = BallSequence;
                 } else if (detection.id == 23){
                     // PPG
-                    ballArray = new double[]{0.192, 0.938, 0.565};
+                     ballArray = new double[]{0.23, 0.95, 0.595};
                      BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN};
                      VoltacularOp.colorSequence = BallSequence;
                 } else {
@@ -290,11 +293,11 @@ public class VoltaSuperAuto extends LinearOpMode {
         moveRobot(-0.15,0,0);
         runtime.reset();
         while(balls < 3 && runtime.milliseconds() < 5000){
-            telemetry.addData("touched", bcs.alpha() > 250);
+            telemetry.addData("touched", laser.getState());
             telemetry.addData("balls", balls);
             telemetry.update();
             drive.update();
-            if(bcs.alpha() > 250 && lastIntake.milliseconds() > 600 && balls < 3){
+            if(laser.getState() && lastIntake.milliseconds() > 600 && balls < 3){
                 balls++;
                 if(balls < 3){
                     moveRobot(-0.15 - (0.15 * balls),0,0);
@@ -587,6 +590,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         out.setDirection(DcMotorSimple.Direction.FORWARD);
         out1.setDirection(DcMotorSimple.Direction.REVERSE);
         intake = hardwareMap.get(DcMotor.class, "i");
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
         linear = hardwareMap.get(Servo.class, "li");
@@ -595,6 +599,7 @@ public class VoltaSuperAuto extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         bcs = hardwareMap.get(ColorSensor.class, "bottomColor");
+        laser = hardwareMap.get(DigitalChannel.class, "laser");
 
         if (USE_WEBCAM)
             setManualExposure(1200, 5000);  // Use low exposure time to reduce motion blur

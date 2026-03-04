@@ -26,9 +26,9 @@ public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "ll"));
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rf"));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "lf"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "lr"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
