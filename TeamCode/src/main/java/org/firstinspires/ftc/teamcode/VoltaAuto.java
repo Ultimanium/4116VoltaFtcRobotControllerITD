@@ -64,7 +64,7 @@ public class VoltaAuto extends LinearOpMode {
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;//  Used to control the right back drive wheel
     private Servo linear = null;
-    private TouchSensor intakeTouch = null;
+    //private TouchSensor intakeTouch = null;
 
     int desiredID = -1;
 
@@ -72,14 +72,18 @@ public class VoltaAuto extends LinearOpMode {
     double[] ballArray = {-1,-1,-1};
     double[] ballInputArray = {0,0.354,0.7272};
     long delay = 0;
+    double flywheelPower = 1200;
 
     public enum START_POSITION{
         Left,
         Right
     }
 
-    double P = 15.5;
-    double F = 0;
+    public float P = 35f;
+    public float I = 0;
+    public float D = 0.1f;
+    public float F = 11.9f;
+    
 
     public VoltacularOp.BALL[] Balls = {null,null,null};
 
@@ -215,7 +219,7 @@ public class VoltaAuto extends LinearOpMode {
         kick = hardwareMap.get(Servo.class, "k");
         wheel = hardwareMap.get(Servo.class, "pw");
         linear = hardwareMap.get(Servo.class, "li");
-        intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
+        //intakeTouch = hardwareMap.get(TouchSensor.class, "touch");
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -266,7 +270,7 @@ public class VoltaAuto extends LinearOpMode {
         wheel.setPosition(0.35);
         waitForStart();
         linear.setPosition(0.6);
-        wheel.setPosition(0.35);
+        wheel.setPosition(0.95);
         sleep(delay);
         moveRobot(0.75,0,0);
         sleep(1500);
@@ -289,27 +293,27 @@ public class VoltaAuto extends LinearOpMode {
                         break;  // stop your gaze.
                     } else if (detection.id == 21){
                         // GPP
-                        ballArray = new double[]{0.565, 0.192, 0.909};
+                        ballArray = new double[]{0.595, 0.23, 0.95};
                         BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE};
                         VoltacularOp.colorSequence = BallSequence;
                         if(balls == 3){
-                            wheel.setPosition(0.565);
+                            wheel.setPosition(0.595);
                         }
                     } else if (detection.id == 22){
                         // PGP
-                        ballArray = new double[]{0.192, 0.565, 0.909};
+                        ballArray = new double[]{0.23, 0.595, 0.95};
                         BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN, VoltacularOp.COLOR.PURPLE};
                         VoltacularOp.colorSequence = BallSequence;
                         if(balls == 3){
-                            wheel.setPosition(0.192);
+                            wheel.setPosition(0.23);
                         }
                     } else if (detection.id == 23){
                         // PPG
-                        ballArray = new double[]{0.192, 0.909, 0.565};
+                        ballArray = new double[]{0.23, 0.95, 0.595};
                         BallSequence = new VoltacularOp.COLOR[]{VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.PURPLE, VoltacularOp.COLOR.GREEN};
                         VoltacularOp.colorSequence = BallSequence;
                         if(balls == 3){
-                            wheel.setPosition(0.192);
+                            wheel.setPosition(0.23);
                         }
                     } else {
                         // nuh uh
@@ -344,48 +348,48 @@ public class VoltaAuto extends LinearOpMode {
                     telemetry.update();
                     linear.setPosition(0.6);
                     kick.setPosition(0.6);
-                    out1.setVelocity(3240);
-                    out.setVelocity(out1.getVelocity());
-                    PIDFCoefficients test2 = new PIDFCoefficients(P, 0, 0, F);
+                    out1.setVelocity(flywheelPower);
+                    out.setVelocity(flywheelPower);
+                    PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
                     out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                    PIDFCoefficients test1 = new PIDFCoefficients(P, 0, 0, F);
+                    PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
                     out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     moveRobot(0,0,0);
                     wheel.setPosition(ballArray[3 - balls]);
                     runtime.reset();
                     while(runtime.milliseconds() < 500){
-                        out1.setVelocity(3240);
-                        out.setVelocity(out1.getVelocity());
-                        test2 = new PIDFCoefficients(P, 0, 0, F);
+                        out1.setVelocity(flywheelPower);
+                        out.setVelocity(flywheelPower);
+                        test2 = new PIDFCoefficients(P, I, D, F);
                         out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                        test1 = new PIDFCoefficients(P, 0, 0, F);
+                        test1 = new PIDFCoefficients(P, I, D, F);
                         out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     }
                     kick.setPosition(0.15);
                     runtime.reset();
                     while(runtime.milliseconds() < 400){
-                        out1.setVelocity(3240);
-                        out.setVelocity(out1.getVelocity());
-                        test2 = new PIDFCoefficients(P, 0, 0, F);
+                        out1.setVelocity(flywheelPower);
+                        out.setVelocity(flywheelPower);
+                        test2 = new PIDFCoefficients(P, I, D, F);
                         out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                        test1 = new PIDFCoefficients(P, 0, 0, F);
+                        test1 = new PIDFCoefficients(P, I, D, F);
                         out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     }
                     kick.setPosition(0.6);
                     runtime.reset();
                     while(runtime.milliseconds() < 350){
-                        out1.setVelocity(3240);
-                        out.setVelocity(out1.getVelocity());
-                        test2 = new PIDFCoefficients(P, 0, 0, F);
+                        out1.setVelocity(flywheelPower);
+                        out.setVelocity(flywheelPower);
+                        test2 = new PIDFCoefficients(P, I, D, F);
                         out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                        test1 = new PIDFCoefficients(P, 0, 0, F);
+                        test1 = new PIDFCoefficients(P, I, D, F);
                         out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     }
                     out1.setVelocity(0);
-                    out.setVelocity(out1.getVelocity());
-                    test2 = new PIDFCoefficients(P, 0, 0, F);
+                    out.setVelocity(0);
+                    test2 = new PIDFCoefficients(P, I, D, F);
                     out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-                    test1 = new PIDFCoefficients(P, 0, 0, F);
+                    test1 = new PIDFCoefficients(P, I, D, F);
                     out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
                     balls--;
                 } else {
@@ -422,12 +426,12 @@ public class VoltaAuto extends LinearOpMode {
             if(balls == 0){
                 if(desiredID == 20){
                     moveRobot(0,1,0);
-                    sleep(2000);
+                    sleep(1000);
                     moveRobot(0,0,0);
                     break;
                 } else {
                     moveRobot(0,-1,0);
-                    sleep(2000);
+                    sleep(1000);
                     moveRobot(0,0,0);
                     break;
                 }

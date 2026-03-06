@@ -421,7 +421,7 @@ public class VoltacularOp extends LinearOpMode {
                 wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
                 if(!ShootToLoad || lastIntake.milliseconds() > 1250){
                     ShootToLoad = false;
-                    if (laser.getState() && lastIntake.milliseconds() > 600) {
+                    if (bcs.alpha() > 250 && lastIntake.milliseconds() > 600) {
                         telemetry.addData("FinalInput", true);
                         lastIntake.reset();
                         if ((bcs.red() + bcs.blue()) / 2.0 > bcs.green()) {

@@ -80,7 +80,7 @@ public class VoltaSuperAuto extends LinearOpMode {
     public float I = 0;
     public float D = 0.1f;
     public float F = 11.9f;
-    double flywheelPower = 1650;
+    double flywheelPower = 1250;
 
     public VoltacularOp.BALL[] Balls = {null,null,null};
 
@@ -141,8 +141,8 @@ public class VoltaSuperAuto extends LinearOpMode {
         } else {
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, -25, 0);
-            shootPosition = new Pose2d(8, 0, -Math.toRadians(24));
-            shootPositionSecond = new Pose2d(8, 3, -Math.toRadians(24));
+            shootPosition = new Pose2d(8, 0, -Math.toRadians(22));
+            shootPositionSecond = new Pose2d(8, 3, -Math.toRadians(22));
             inputStart = new Pose2d(28, -5, Math.toRadians(90));
             inputs = new Pose2d[] {new Pose2d(28, -16.5, Math.toRadians(90)), new Pose2d(28, -21, Math.toRadians(90)), new Pose2d(28, -27, Math.toRadians(90))};
         }
@@ -179,6 +179,14 @@ public class VoltaSuperAuto extends LinearOpMode {
         waitForStart();
         linear.setPosition(0.15);
         kick.setPosition(0.6);
+        wheel.setPosition(0.95);
+
+        out1.setVelocity(flywheelPower);
+        out.setVelocity(flywheelPower);
+        PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
+        out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+        PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
+        out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
 
         targetFound = false;
         desiredTag = null;
@@ -269,11 +277,12 @@ public class VoltaSuperAuto extends LinearOpMode {
 
         while(drive.isBusy()){
             drive.update();
+
             out1.setVelocity(flywheelPower);
             out.setVelocity(flywheelPower);
-            PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
+            test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
+            test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
 
@@ -333,9 +342,9 @@ public class VoltaSuperAuto extends LinearOpMode {
             drive.update();
             out1.setVelocity(flywheelPower);
             out.setVelocity(flywheelPower);
-            PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
+            test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
-            PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
+            test1 = new PIDFCoefficients(P, I, D, F);
             out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
         }
 
