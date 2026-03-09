@@ -346,10 +346,10 @@ public class VoltacularOp extends LinearOpMode {
                 light1.setPosition(0.65);
             }
 
-            out1.setVelocity(outPower * outToggle);
+            out1.setVelocity(outPower * Math.min(outToggle + gamepad2.right_trigger, 1));
             double velocity = out1.getVelocity();
             double error = outPower-out1.getVelocity();
-            out.setVelocity(outPower * outToggle);
+            out.setVelocity(outPower * Math.min(outToggle + gamepad2.right_trigger, 1));
             PIDFCoefficients test2 = new PIDFCoefficients(P, I, D, F);
             out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
             PIDFCoefficients test1 = new PIDFCoefficients(P, I, D, F);
