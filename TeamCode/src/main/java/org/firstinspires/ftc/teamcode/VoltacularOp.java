@@ -421,7 +421,7 @@ public class VoltacularOp extends LinearOpMode {
                 wheel.setPosition(ProtoBall.INPUTPOSITIONS[focusedBall]);
                 if(!ShootToLoad || lastIntake.milliseconds() > 1250){
                     ShootToLoad = false;
-                    Boolean buttonBinding = gamepad2.dpad_down;
+                    Boolean buttonBinding = gamepad2.dpad_up;
                     if (((bcs.alpha() > 250 && !buttonBinding) || (laser.getState() && buttonBinding)) && lastIntake.milliseconds() > 600) {
                         telemetry.addData("FinalInput", true);
                         lastIntake.reset();

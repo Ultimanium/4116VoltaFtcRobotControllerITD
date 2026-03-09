@@ -80,7 +80,7 @@ public class VoltaSuperAuto extends LinearOpMode {
     public float I = 0;
     public float D = 0.1f;
     public float F = 11.9f;
-    double flywheelPower = 1250;
+    double flywheelPower = 1625;
 
     public VoltacularOp.BALL[] Balls = {null,null,null};
 
