@@ -130,20 +130,26 @@ public class VoltaSuperAuto extends LinearOpMode {
         Pose2d shootPosition;
         Pose2d shootPositionSecond;
         Pose2d inputStart;
+        Pose2d uncommonInputStart;
+        Pose2d exitInput;
         Pose2d[] inputs;
         if(currentTeam == TEAM.BLUE){
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, 25, 0);
             shootPosition = new Pose2d(8, 0, Math.toRadians(20));
             shootPositionSecond = new Pose2d(8, -3, Math.toRadians(22));
-            inputStart = new Pose2d(28, 5, -Math.toRadians(90));
+            inputStart = new Pose2d(28, 8, -Math.toRadians(90));
+            uncommonInputStart = new Pose2d(23, 42, -Math.toRadians(0));
+            exitInput = new Pose2d(25, 10, -Math.toRadians(0));
             inputs = new Pose2d[] {new Pose2d(28, 16.5, -Math.toRadians(90)), new Pose2d(28, 21, -Math.toRadians(90)), new Pose2d(28, 27, -Math.toRadians(90))};
         } else {
             startPose = new Pose2d(0, 0, 0);
             endPose = new Pose2d(1, -25, 0);
             shootPosition = new Pose2d(8, 0, -Math.toRadians(22));
             shootPositionSecond = new Pose2d(8, 3, -Math.toRadians(22));
-            inputStart = new Pose2d(28, -5, Math.toRadians(90));
+            inputStart = new Pose2d(28, -8, Math.toRadians(90));
+            uncommonInputStart = new Pose2d(23, -42, -Math.toRadians(0));
+            exitInput = new Pose2d(25, -10, -Math.toRadians(0));
             inputs = new Pose2d[] {new Pose2d(28, -16.5, Math.toRadians(90)), new Pose2d(28, -21, Math.toRadians(90)), new Pose2d(28, -27, Math.toRadians(90))};
         }
 
@@ -172,7 +178,17 @@ public class VoltaSuperAuto extends LinearOpMode {
         Trajectory toShootAgain = drive.trajectoryBuilder(toBall3.end())
                 .lineToLinearHeading(shootPositionSecond)
                 .build();
-        Trajectory end = drive.trajectoryBuilder(toShootAgain.end())
+        Trajectory toIntakeAgain = drive.trajectoryBuilder(toShootAgain.end())
+                .lineToLinearHeading(uncommonInputStart)
+                .build();
+        Trajectory toExitIntake = drive.trajectoryBuilder(toIntakeAgain.end())
+                .lineToLinearHeading(exitInput)
+                .build();
+        Trajectory toShootAgainAgain = drive.trajectoryBuilder(toExitIntake.end())
+                .lineToLinearHeading(shootPositionSecond)
+                .build();
+
+        Trajectory end = drive.trajectoryBuilder(toShootAgainAgain.end())
                 .lineToLinearHeading(endPose)
                 .build();
 
@@ -290,7 +306,6 @@ public class VoltaSuperAuto extends LinearOpMode {
             shootBall();
         }
 
-        sleep(1000);
         wheel.setPosition(ballInputArray[0]);
 
         out.setPower(0);
@@ -327,13 +342,11 @@ public class VoltaSuperAuto extends LinearOpMode {
         moveRobot(0,0,0);
         balls = 3;
 
-        sleep(1000);
-
         toShootAgain = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(shootPositionSecond)
                 .build();
-        end = drive.trajectoryBuilder(toShootAgain.end())
-                .lineToLinearHeading(endPose)
+        toIntakeAgain = drive.trajectoryBuilder(toShootAgain.end())
+                .lineToLinearHeading(uncommonInputStart)
                 .build();
 
         drive.followTrajectoryAsync(toShootAgain);
@@ -354,14 +367,89 @@ public class VoltaSuperAuto extends LinearOpMode {
             shootBall();
         }
 
+        wheel.setPosition(ballInputArray[0]);
+
+        out.setPower(0);
+        out1.setPower(-0);
+
+        intake.setPower(1);
+        drive.followTrajectory(toIntakeAgain);
+        //drive.followTrajectoryAsync(allBalls[0]);
+        moveRobot(-0.15,0,0);
+        runtime.reset();
+        while(balls < 3 && runtime.milliseconds() < 5000){
+            telemetry.addData("touched", laser.getState());
+            telemetry.addData("balls", balls);
+            telemetry.update();
+            drive.update();
+            if(laser.getState() && lastIntake.milliseconds() > 600 && balls < 3){
+                balls++;
+                if(balls < 3){
+                    moveRobot(-0.15 - (0.15 * balls),0,0);
+                    wheel.setPosition(ballInputArray[balls]);
+                    lastIntake.reset();
+                    if(balls == 2){
+                        moveRobot(0,0,0);
+                        sleep(500);
+                        moveRobot(-0.25 - (0.15 * balls),0,0);
+                    }
+                    //while(drive.isBusy()){
+                    //drive.update();
+                    //}
+                    //drive.followTrajectoryAsync(allBalls[balls]);
+                }
+            }
+        }
+        moveRobot(0,0,0);
+        balls = 3;
+
+        toExitIntake = drive.trajectoryBuilder(toIntakeAgain.end())
+                .lineToLinearHeading(exitInput)
+                .build();
+        toShootAgainAgain = drive.trajectoryBuilder(toExitIntake.end())
+                .lineToLinearHeading(shootPositionSecond)
+                .build();
+        /*
+        end = drive.trajectoryBuilder(toShootAgainAgain.end())
+                .lineToLinearHeading(endPose)
+                .build();
+
+         */
+
+        drive.followTrajectory(toExitIntake);
+
+        /*
+        sleep(2000);
+
+        drive.followTrajectoryAsync(toShootAgain);
+
+        while(drive.isBusy()){
+            drive.update();
+            out1.setVelocity(flywheelPower);
+            out.setVelocity(flywheelPower);
+            test2 = new PIDFCoefficients(P, I, D, F);
+            out.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test2);
+            test1 = new PIDFCoefficients(P, I, D, F);
+            out1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,test1);
+        }
+
+        intake.setPower(0);
+        ballArray = new double[]{0.23, 0.595, 0.95};
+        while (balls > 0){
+            shootBall();
+        }
+        kick.setPosition(0.6);
         sleep(1000);
 
         drive.followTrajectory(end);
 
+         */
         while (opModeIsActive()) {
 
             out.setPower(0);
             out1.setPower(0);
+
+            kick.setPosition(0.6);
 
             //List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
