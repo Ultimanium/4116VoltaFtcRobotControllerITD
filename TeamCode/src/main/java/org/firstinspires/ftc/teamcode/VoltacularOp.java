@@ -350,6 +350,9 @@ public class VoltacularOp extends LinearOpMode {
             if(gamepad1.left_bumper && gamepad1.right_bumper){
                 t = 1;
             }
+            if(gamepad1.x){
+               t = 0;
+            }
             touch.setPosition(t);
             out1.setVelocity(outPower * Math.min(outToggle + gamepad2.right_trigger, 1));
             double velocity = out1.getVelocity();
