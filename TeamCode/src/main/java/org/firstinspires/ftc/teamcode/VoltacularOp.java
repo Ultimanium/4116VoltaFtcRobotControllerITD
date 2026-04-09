@@ -74,7 +74,7 @@ public class VoltacularOp extends LinearOpMode {
     private DigitalChannel laser = null;
     private Servo light1 = null;
     private Servo touch = null;
-    double t = 1;
+    double t = 0;
     double  ws = 0;
     double test = 0;
     double s = 0;
@@ -348,10 +348,10 @@ public class VoltacularOp extends LinearOpMode {
                 light1.setPosition(0.65);
             }
             if(gamepad1.left_bumper && gamepad1.right_bumper){
-                t = 0;
+                t = 1;
             }
-            if(gamepad1.dpad_down){
-               t = 1;
+            if(gamepad1.x){
+               t = 0;
             }
             touch.setPosition(t);
             out1.setVelocity(outPower * Math.min(outToggle + gamepad2.right_trigger, 1));
