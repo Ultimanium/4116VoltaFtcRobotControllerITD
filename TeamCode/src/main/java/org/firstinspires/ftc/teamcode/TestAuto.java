@@ -39,6 +39,7 @@ public class TestAuto extends LinearOpMode  {
     private DcMotor rf = null;
     private DcMotor lb = null;
     private DcMotor rb = null;
+    private ElapsedTime runtime = new ElapsedTime();
 
     @Override
 public void runOpMode() {
@@ -52,10 +53,13 @@ public void runOpMode() {
         rb.setDirection(DcMotor.Direction.FORWARD);
 
         waitForStart();
-        moveRobot(0, 0, 0);
-
-        moveRobot(1, 0, 0);
-
+        while(runtime.milliseconds()<400) {
+            moveRobot(1, 0, 0);
+        }
+        runtime.reset();
+        while(runtime.milliseconds()<300) {
+            moveRobot(0, 1, 0);
+        }
 
 
     }
