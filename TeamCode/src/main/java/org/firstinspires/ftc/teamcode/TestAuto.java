@@ -40,6 +40,7 @@ public class TestAuto extends LinearOpMode  {
     private DcMotor lb = null;
     private DcMotor rb = null;
     private ElapsedTime runtime = new ElapsedTime();
+    double test = 0;
 
     @Override
 public void runOpMode() {
@@ -53,11 +54,14 @@ public void runOpMode() {
         rb.setDirection(DcMotor.Direction.FORWARD);
 
         waitForStart();
-        while(runtime.milliseconds()<400) {
+        while(runtime.milliseconds()<2000&&test==0) {
             moveRobot(1, 0, 0);
         }
-        runtime.reset();
-        while(runtime.milliseconds()<300) {
+        if(runtime.milliseconds()>2000&& test==0){
+            test=1;
+            runtime.reset();
+        }
+        while(runtime.milliseconds()<1000&&test==1) {
             moveRobot(0, 1, 0);
         }
 
@@ -82,10 +86,10 @@ public void runOpMode() {
             rightBackPower /= max;
         }
         // Send powers to the wheels.
-        lf.setPower(leftFrontPower);
-        rf.setPower(rightFrontPower);
-        lb.setPower(leftBackPower);
-        rb.setPower(rightBackPower);
+        lf.setPower(leftFrontPower/4);
+        rf.setPower(rightFrontPower/4);
+        lb.setPower(leftBackPower/4);
+        rb.setPower(rightBackPower/4);
     }
 
 }
