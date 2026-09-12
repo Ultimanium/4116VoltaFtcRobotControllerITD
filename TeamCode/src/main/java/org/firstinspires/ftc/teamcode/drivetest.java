@@ -17,6 +17,9 @@ public class drivetest extends LinearOpMode {
     private DcMotor rightBackDrive   = null;
     private DcMotor in = null;
     private Servo kick = null;
+    private Servo kick2 = null;
+    private DcMotor out = null;
+    private DcMotor out2 = null;
 
     @Override
     public void runOpMode() {
@@ -29,6 +32,10 @@ public class drivetest extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
         in = hardwareMap.get(DcMotor.class, "in");
         kick = hardwareMap.get(Servo.class,"kick");
+        kick2 = hardwareMap.get(Servo.class,"kick2");
+        out = hardwareMap.get(DcMotor.class, "out");
+        out2 = hardwareMap.get(DcMotor.class, "out2");
+
         waitForStart();
         while (opModeIsActive()) {
 
@@ -39,7 +46,20 @@ public class drivetest extends LinearOpMode {
             if(gamepad2.b){
                 kick.setPosition(0);
             }
-
+            if(gamepad2.dpad_up){
+                out.setPower(1);
+                out2.setPower(-1);
+            }
+            if(gamepad2.dpad_down){
+                out.setPower(0);
+                out2.setPower(0);
+            }
+            if(gamepad2.x){
+            kick2.setPosition(90);
+            }
+            if(gamepad2.y){
+                kick2.setPosition(0);
+            }
 
             drive  = -gamepad1.left_stick_y;
             strafe = -gamepad1.left_stick_x;
