@@ -15,6 +15,8 @@ public class drivetest extends LinearOpMode {
     private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;
+    private DcMotor in = null;
+    private Servo kick = null;
 
     @Override
     public void runOpMode() {
@@ -25,15 +27,25 @@ public class drivetest extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
+        in = hardwareMap.get(DcMotor.class, "in");
+        kick = hardwareMap.get(Servo.class,"kick");
         waitForStart();
         while (opModeIsActive()) {
 
+            in.setPower(gamepad2.left_stick_y);
+            if(gamepad2.a){
+                kick.setPosition(90);
+            }
+            if(gamepad2.b){
+                kick.setPosition(0);
+            }
 
 
             drive  = -gamepad1.left_stick_y;
             strafe = -gamepad1.left_stick_x;
             turn   = -gamepad1.right_stick_x/2;
             telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+            telemetry.addData("intake power:", in.getPower());
             moveRobot(drive, strafe, turn);
         }
 
@@ -61,4 +73,5 @@ public class drivetest extends LinearOpMode {
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);}
+
 }
